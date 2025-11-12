@@ -35,7 +35,7 @@ jobs:
       - name: Build release
         run: cargo build --release --target ${{ inputs.target }}
       - name: Upload release
-        uses: actions/gh-release@v2.4.2
+        uses: softprops/action-gh-release@v2.4.2
         with:
           tag_name: ${{ inputs.version }}
           files: target/${{ inputs.target }}/release/${{ inputs.name }}
