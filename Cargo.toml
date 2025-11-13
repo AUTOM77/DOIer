@@ -1,6 +1,6 @@
 [package]
 name = "doi"
-version = "0.0.4"
+version = "0.0.5"
 edition = "2024"
 
 [dependencies]
@@ -19,7 +19,6 @@ actix-web-lab = "0.24"
 actix-web-static-files = "4.1"
 futures-util = "0.3"
 percent-encoding = "2.3"
-scraper = "0.24"
 
 [target.'cfg(all(target_env = "musl", target_pointer_width = "64"))'.dependencies.jemallocator]
 version = "0.5"
