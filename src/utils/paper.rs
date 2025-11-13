@@ -104,19 +104,11 @@ impl Paper {
         let mut builder = HttpResponse::Ok();
         builder.append_header((actix_header::CONTENT_TYPE, "application/pdf"));
 
-        if let Some(cd) = resp
-            .headers()
-            .get(header::CONTENT_DISPOSITION)
-            .and_then(|v| v.to_str().ok())
-        {
-            builder.append_header((actix_header::CONTENT_DISPOSITION, cd.to_string()));
-        } else {
-            let safe = doi.replace('/', "_");
-            builder.append_header((
-                actix_header::CONTENT_DISPOSITION,
-                format!("inline; filename=\"{safe}.pdf\""),
-            ));
-        }
+        let safe = doi.replace('/', "_");
+        builder.append_header((
+            actix_header::CONTENT_DISPOSITION,
+            format!("attachment; filename=\"{safe}.pdf\""),
+        ));
 
         let stream = resp
             .bytes_stream()
