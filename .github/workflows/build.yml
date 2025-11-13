@@ -32,6 +32,8 @@ jobs:
           submodules: 'recursive'
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@nightly
+      - name: Install target
+        run: rustup target add ${{ inputs.target }}
       - name: Build release
         run: cargo build --release --target ${{ inputs.target }}
       - name: Upload release
