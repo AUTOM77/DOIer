@@ -127,11 +127,7 @@ impl Doi {
                 if let Some(last_part) = parts.last() {
                     if let Some(arnumber) = last_part.split('.').last() {
                         urls.push(format!(
-                            "https://ieeexplore.ieee.org/document/{}",
-                            arnumber
-                        ));
-                        urls.push(format!(
-                            "https://ieeexplore.ieee.org/stampPDF/getPDF.jsp?tp=&arnumber={}",
+                            "https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber={}",
                             arnumber
                         ));
                     }
