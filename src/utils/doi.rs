@@ -123,11 +123,13 @@ impl Doi {
                 urls.push(format!("https://dl.acm.org/doi/pdf/{}", self.raw));
             }
             DoiPublisher::Ieee => {
+                // IEEE DOI format: 10.1109/5.771073 -> arnumber is 771073
+                // PDF URL: https://ieeexplore.ieee.org/stampPDF/getPDF.jsp?tp=&arnumber=771073
                 let parts: Vec<&str> = self.raw.split('/').collect();
                 if let Some(last_part) = parts.last() {
                     if let Some(arnumber) = last_part.split('.').last() {
                         urls.push(format!(
-                            "https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber={}",
+                            "https://ieeexplore.ieee.org/stampPDF/getPDF.jsp?tp=&arnumber={}",
                             arnumber
                         ));
                     }

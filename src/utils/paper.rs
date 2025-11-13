@@ -18,6 +18,7 @@ impl Paper {
             .connect_timeout(Duration::from_secs(10))
             .timeout(Duration::from_secs(120))
             .pool_max_idle_per_host(8)
+            .cookie_store(true)  // Enable cookie storage for IEEE session handling
             .build()
             .expect("reqwest client");
         Self { client }
@@ -29,6 +30,17 @@ impl Paper {
 
         for pdf_url in &pdf_urls {
             eprintln!("Trying direct URL: {}", pdf_url);
+
+            // IEEE requires visiting document page first to establish session
+            if pdf_url.contains("ieeexplore.ieee.org/stampPDF") {
+                if let Some(arnumber) = pdf_url.split("arnumber=").nth(1) {
+                    let doc_url = format!("https://ieeexplore.ieee.org/document/{}", arnumber);
+                    eprintln!("IEEE: First visiting document page: {}", doc_url);
+                    // Visit document page to establish session (ignore response)
+                    let _ = self.request_pdf(&doc_url).await;
+                }
+            }
+
             match self.request_pdf(pdf_url).await {
                 Ok(resp) => {
                     eprintln!("Response status: {}", resp.status());
