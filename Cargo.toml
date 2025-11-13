@@ -1,6 +1,6 @@
 [package]
 name = "doi"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2024"
 
 [dependencies]
@@ -29,7 +29,7 @@ version = "0.1"
 features = ["secure"]
 
 [[bin]]
-name = "hydra"
+name = "doi"
 path = "src/cli.rs"
 
 [lib]

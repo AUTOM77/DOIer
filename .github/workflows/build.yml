@@ -40,7 +40,7 @@ jobs:
         uses: softprops/action-gh-release@v2.4.2
         with:
           tag_name: ${{ inputs.version }}
-          files: target/${{ inputs.target }}/release/${{ inputs.name }}
+          files: target/release/${{ inputs.name }}
           draft: false
           prerelease: false
           overwrite_files: true
