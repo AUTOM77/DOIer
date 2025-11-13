@@ -15,7 +15,6 @@ pub enum DoiPublisher {
 
     // Other major Crossref publishers
     ScienceAaas,        // 10.1126
-    CellPress,          // 10.1016 (also Elsevier, but Cell Press uses many subprefixes)
     Acs,                // 10.1021
     Rsc,                // 10.1039
     Iop,                // 10.1088
@@ -124,11 +123,18 @@ impl Doi {
                 urls.push(format!("https://dl.acm.org/doi/pdf/{}", self.raw));
             }
             DoiPublisher::Ieee => {
-                if let Some(arnumber) = self.raw.split('/').nth(1) {
-                    urls.push(format!(
-                        "https://ieeexplore.ieee.org/stampPDF/getPDF.jsp?tp=&arnumber={}",
-                        arnumber
-                    ));
+                let parts: Vec<&str> = self.raw.split('/').collect();
+                if let Some(last_part) = parts.last() {
+                    if let Some(arnumber) = last_part.split('.').last() {
+                        urls.push(format!(
+                            "https://ieeexplore.ieee.org/document/{}",
+                            arnumber
+                        ));
+                        urls.push(format!(
+                            "https://ieeexplore.ieee.org/stampPDF/getPDF.jsp?tp=&arnumber={}",
+                            arnumber
+                        ));
+                    }
                 }
             }
             DoiPublisher::Springer => {
@@ -178,10 +184,6 @@ impl Doi {
             // Other major Crossref publishers
             DoiPublisher::ScienceAaas => {
                 urls.push(format!("https://www.science.org/doi/pdf/{}", self.raw));
-            }
-            DoiPublisher::CellPress => {
-                urls.push(format!("https://www.cell.com/action/showPdf?pii={}",
-                    self.raw.split('/').nth(1).unwrap_or("")));
             }
             DoiPublisher::Acs => {
                 urls.push(format!("https://pubs.acs.org/doi/pdf/{}", self.raw));

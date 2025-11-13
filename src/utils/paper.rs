@@ -24,27 +24,39 @@ impl Paper {
     }
 
     pub async fn fetch_pdf_httpresponse(&self, doi: &str) -> actix_web::Result<HttpResponse> {
-        // Try direct PDF URLs based on DOI prefix patterns
         let doi_struct = Doi::new(doi);
         let pdf_urls = doi_struct.construct_pdf_urls();
 
-        for pdf_url in pdf_urls {
-            if let Ok(resp) = self.request_pdf(&pdf_url).await {
-                if Self::is_pdf(&resp) {
-                    return Self::stream_as_pdf(resp, doi);
+        for pdf_url in &pdf_urls {
+            eprintln!("Trying direct URL: {}", pdf_url);
+            match self.request_pdf(pdf_url).await {
+                Ok(resp) => {
+                    eprintln!("Response status: {}", resp.status());
+                    if Self::is_pdf(&resp) {
+                        eprintln!("PDF found at: {}", pdf_url);
+                        return Self::stream_as_pdf(resp, doi);
+                    } else {
+                        eprintln!("Not a PDF, content-type: {:?}", resp.headers().get("content-type"));
+                    }
+                }
+                Err(e) => {
+                    eprintln!("Failed to fetch {}: {:?}", pdf_url, e);
                 }
             }
         }
 
-        // Fallback to original DOI resolution
         let encoded = utf8_percent_encode(doi, NON_ALPHANUMERIC).to_string();
         let target = format!("https://doi.org/{encoded}");
+        eprintln!("Falling back to DOI redirect: {}", target);
 
         let resp = self.request_pdf(&target).await?;
+        eprintln!("DOI redirect response status: {}", resp.status());
         if Self::is_pdf(&resp) {
+            eprintln!("PDF found via DOI redirect");
             return Self::stream_as_pdf(resp, doi);
         }
 
+        eprintln!("Could not locate PDF for DOI: {}", doi);
         Err(actix_web::error::ErrorBadGateway(
             "Could not locate PDF",
         ))
