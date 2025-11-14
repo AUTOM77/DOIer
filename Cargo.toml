@@ -1,22 +1,13 @@
 [package]
 name = "doi"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2024"
 
 [dependencies]
 clap = { version = "4.5", features = ["derive"] }
 reqwest = { version = "0.12", default-features = false, features = ["http2", "json", "rustls-tls", "brotli", "stream", "gzip", "deflate", "cookies"] }
 tokio = { version = "1.48", default-features = false, features = ["rt-multi-thread", "fs"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
-sea-orm = { version = "1.1", features = [ "sqlx-postgres", "runtime-async-std-rustls", "macros" ] }
-actix-files = "0.6"
-actix-multipart = "0.7"
 actix-web = "4.11"
-actix-web-grants = "4.1"
-actix-web-httpauth = "0.8"
-actix-web-lab = "0.24"
-actix-web-static-files = "4.1"
 futures-util = "0.3"
 percent-encoding = "2.3"
 

@@ -48,102 +48,52 @@ pub async fn index() -> impl Responder {
             box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
         }
 
-        /* Toast Notifications */
-        .toast-container {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            z-index: 9998;
-            pointer-events: none;
-        }
-
-        .toast {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-radius: 14px;
-            padding: 1rem 1.5rem;
-            margin-bottom: 1rem;
-            min-width: 300px;
-            max-width: 400px;
-            box-shadow:
-                0 20px 40px rgba(0, 0, 0, 0.15),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            opacity: 0;
-            transform: translateX(400px);
-            animation: slideInFromRight 0.4s forwards;
-            pointer-events: all;
-        }
-
-        @keyframes slideInFromRight {
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes slideOutToRight {
-            from {
-                opacity: 1;
-                transform: translateX(0);
-            }
-            to {
-                opacity: 0;
-                transform: translateX(400px);
-            }
-        }
-
-        .toast.hiding {
-            animation: slideOutToRight 0.4s forwards;
-        }
-
-        .toast-icon {
-            font-size: 1.25rem;
-            flex-shrink: 0;
-            padding: 0.5rem;
-            border-radius: 8px;
+        .message-container {
+            margin-top: 1.5rem;
+            min-height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s ease;
         }
 
-        .toast-message {
-            flex: 1;
+        .status-message {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            display: inline-block;
+            font-size: 0.95rem;
             font-weight: 500;
             color: rgba(255, 255, 255, 0.9);
-            font-size: 0.95rem;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.3s ease;
         }
 
-        .toast.success {
+        .status-message.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .status-message.success {
             border-color: rgba(0, 184, 148, 0.3);
+            background: rgba(0, 184, 148, 0.1);
         }
 
-        .toast.success .toast-icon {
-            background: rgba(0, 184, 148, 0.15);
-            color: #00cec9;
-        }
-
-        .toast.error {
+        .status-message.error {
             border-color: rgba(255, 107, 107, 0.3);
+            background: rgba(255, 107, 107, 0.1);
         }
 
-        .toast.error .toast-icon {
-            background: rgba(255, 107, 107, 0.15);
-            color: #ff6b6b;
-        }
-
-        .toast.info {
+        .status-message.info {
             border-color: rgba(116, 185, 255, 0.3);
+            background: rgba(116, 185, 255, 0.1);
         }
 
-        .toast.info .toast-icon {
-            background: rgba(116, 185, 255, 0.15);
-            color: #74b9ff;
-        }
 
         :root {
             --primary: #667eea;
@@ -249,8 +199,17 @@ pub async fn index() -> impl Responder {
             transition: all 0.3s ease;
         }
 
-        nav.scrolled {
+        nav.transparent {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: none;
+        }
+
+        nav.solid {
             background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             box-shadow: 0 5px 40px rgba(0, 0, 0, 0.1);
         }
 
@@ -364,19 +323,9 @@ pub async fn index() -> impl Responder {
             margin-bottom: 1rem;
         }
 
-        .input-icon {
-            position: absolute;
-            left: 1.5rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1.5rem;
-            z-index: 1;
-        }
-
         input[type="text"] {
             width: 100%;
-            padding: 1.75rem 1.75rem 1.75rem 4rem;
+            padding: 1.75rem;
             border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 16px;
             font-size: 1.25rem;
@@ -665,9 +614,6 @@ pub async fn index() -> impl Responder {
         <div class="progress-bar" id="progressBar"></div>
     </div>
 
-    <!-- Toast Container -->
-    <div class="toast-container" id="toastContainer"></div>
-
     <!-- Background Elements -->
     <div class="background"></div>
     <div class="particles" id="particles"></div>
@@ -695,7 +641,6 @@ pub async fn index() -> impl Responder {
                 <div class="search-card">
                     <form id="doiForm">
                         <div class="input-wrapper">
-                            <span class="input-icon">📄</span>
                             <input
                                 type="text"
                                 id="doiInput"
@@ -720,6 +665,13 @@ pub async fn index() -> impl Responder {
                                 Clear
                             </button>
                         </div>
+
+                        <!-- Status Message Container -->
+                        <div class="message-container">
+                            <div id="statusMessage" class="status-message">
+                                <span class="status-text"></span>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -734,7 +686,7 @@ pub async fn index() -> impl Responder {
         <!-- API Section -->
         <section class="api-section" id="api">
             <div class="api-card">
-                <h3>🚀 API Documentation</h3>
+                <h3>API Documentation</h3>
                 <p style="color: var(--gray-600); margin-bottom: 2rem;">Integrate our service into your workflow with our simple REST API.</p>
 
                 <div class="code-block">
@@ -778,14 +730,42 @@ pub async fn index() -> impl Responder {
             particlesContainer.appendChild(particle);
         }
 
-        // Navbar scroll effect
+        // Navbar scroll effect with direction detection
+        let lastScrollY = window.scrollY;
+        let scrollTimer = null;
+
         window.addEventListener('scroll', () => {
             const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
+            const currentScrollY = window.scrollY;
+
+            // Clear any existing timer
+            clearTimeout(scrollTimer);
+
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                // Scrolling down
+                navbar.classList.add('transparent');
+                navbar.classList.remove('solid');
+            } else if (currentScrollY < lastScrollY || currentScrollY <= 50) {
+                // Scrolling up or at the top
+                navbar.classList.remove('transparent');
+                if (currentScrollY > 50) {
+                    navbar.classList.add('solid');
+                } else {
+                    navbar.classList.remove('solid');
+                }
             }
+
+            // Set timer to solidify navbar when scrolling stops
+            scrollTimer = setTimeout(() => {
+                navbar.classList.remove('transparent');
+                if (currentScrollY > 50) {
+                    navbar.classList.add('solid');
+                } else {
+                    navbar.classList.remove('solid');
+                }
+            }, 150);
+
+            lastScrollY = currentScrollY;
         });
 
         // Handle navigation clicks with smooth scrolling
@@ -801,32 +781,33 @@ pub async fn index() -> impl Responder {
             return false;
         }
 
-        // Notification System
-        function showToast(message, type) {
-            const toastContainer = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
+        // In-place Message System
+        function showMessage(message, type) {
+            const statusMessage = document.getElementById('statusMessage');
+            const statusText = statusMessage.querySelector('.status-text');
 
-            const icons = {
-                success: '✅',
-                error: '❌',
-                info: 'ℹ️'
-            };
+            // Update content
+            statusText.textContent = message;
 
-            toast.innerHTML = `
-                <div class="toast-icon">${icons[type]}</div>
-                <div class="toast-message">${message}</div>
-            `;
+            // Update classes
+            statusMessage.className = `status-message ${type}`;
 
-            toastContainer.appendChild(toast);
-
-            // Auto remove after 5 seconds
+            // Show message with animation
             setTimeout(() => {
-                toast.classList.add('hiding');
+                statusMessage.classList.add('show');
+            }, 10);
+
+            // Auto-hide success and error messages after delay
+            if (type !== 'info') {
                 setTimeout(() => {
-                    toast.remove();
-                }, 400);
-            }, 5000);
+                    statusMessage.classList.remove('show');
+                }, 5000);
+            }
+        }
+
+        function hideMessage() {
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.classList.remove('show');
         }
 
         // Progress Bar
@@ -861,25 +842,27 @@ pub async fn index() -> impl Responder {
             const doi = doiInput.value.trim();
 
             if (!doi) {
-                showToast('Please enter a DOI', 'error');
+                showMessage('Please enter a DOI', 'error');
                 return;
             }
 
             if (!doi.startsWith('10.') || !doi.includes('/')) {
-                showToast('Invalid DOI format. Must start with "10." and contain "/"', 'error');
+                showMessage('Invalid DOI format. Must start with "10." and contain "/"', 'error');
                 return;
             }
 
-            showToast('Fetching paper...', 'info');
+            showMessage('Fetching paper...', 'info');
             showProgress(30);
 
             try {
                 const url = `/v1/doi/${doi}`;
                 showProgress(60);
+                showMessage('Connecting to publisher...', 'info');
                 const response = await fetch(url);
                 showProgress(80);
 
                 if (response.ok) {
+                    showMessage('Downloading PDF...', 'info');
                     const blob = await response.blob();
                     showProgress(90);
                     const downloadUrl = window.URL.createObjectURL(blob);
@@ -891,15 +874,15 @@ pub async fn index() -> impl Responder {
                     window.URL.revokeObjectURL(downloadUrl);
                     document.body.removeChild(a);
                     showProgress(100);
-                    showToast('PDF downloaded successfully!', 'success');
+                    showMessage('PDF downloaded successfully!', 'success');
                 } else {
                     showProgress(0);
                     const errorText = await response.text();
-                    showToast(`Error: ${errorText || response.statusText}`, 'error');
+                    showMessage(`Error: ${errorText || response.statusText}`, 'error');
                 }
             } catch (error) {
                 showProgress(0);
-                showToast(`Error: ${error.message}`, 'error');
+                showMessage(`Error: ${error.message}`, 'error');
             }
         });
 
@@ -917,6 +900,7 @@ pub async fn index() -> impl Responder {
             doiInput.value = '';
             doiInput.focus();
             showProgress(0);
+            hideMessage();
         }
 
         // Add pulse animation for input focus
