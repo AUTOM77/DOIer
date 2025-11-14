@@ -151,6 +151,10 @@
             .products-grid {
                 grid-template-columns: 1fr;
             }
+
+            .nav-links {
+                display: none;
+            }
         }
 
         /* Navigation */
@@ -198,6 +202,35 @@
             background-clip: text;
         }
 
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            opacity: 0.9;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+            transform: translateY(-1px);
+        }
+
+        nav.solid .nav-links a {
+            color: #495057;
+        }
+
+        nav.solid .nav-links a:hover {
+            color: #667eea;
+        }
+
         /* Footer */
         footer {
             background: rgba(0, 0, 0, 0.3);
@@ -223,7 +256,11 @@
     <!-- Navigation -->
     <nav id="navbar">
         <div class="nav-container">
-            <div class="logo">{{HUB_NAME}}</div>
+            <a href="/" class="logo" style="text-decoration: none;">{{HUB_NAME}}</a>
+            <ul class="nav-links">
+                <li><a href="/">Hub</a></li>
+                <li><a href="/doi">DOIer</a></li>
+            </ul>
         </div>
     </nav>
 

@@ -24,7 +24,8 @@ pub async fn index() -> impl Responder {
         .replace("{{SERVICE_NAME}}", SERVICE_NAME)
         .replace("{{SERVICE_TITLE}}", SERVICE_TITLE)
         .replace("{{SERVICE_DESCRIPTION}}", SERVICE_DESCRIPTION)
-        .replace("{{EXAMPLE_DOIS}}", &examples_html);
+        .replace("{{EXAMPLE_DOIS}}", &examples_html)
+        .replace("{{HUB_NAME}}", HUB_NAME);
 
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")

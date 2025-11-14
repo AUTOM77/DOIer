@@ -622,8 +622,9 @@
     <!-- Navigation -->
     <nav id="navbar">
         <div class="nav-container">
-            <div class="logo">{{SERVICE_NAME}}</div>
+            <a href="/" class="logo" style="text-decoration: none;">{{HUB_NAME}}</a>
             <ul class="nav-links">
+                <li><a href="/">Hub</a></li>
                 <li><a href="#home" onclick="return handleNavClick(event, 'home')">Home</a></li>
                 <li><a href="#api" onclick="return handleNavClick(event, 'api')">API</a></li>
             </ul>
@@ -707,7 +708,8 @@
 
     <script>
         // Update copyright year
-        document.getElementById('copyright').textContent = `© ${new Date().getFullYear()} {{SERVICE_NAME}}. Built with passion for open science.`;
+        const serviceName = '{{SERVICE_NAME}}';
+        document.getElementById('copyright').textContent = `© ${new Date().getFullYear()} ${serviceName}. Built with passion for open science.`;
 
         // Particle Animation
         const particlesContainer = document.getElementById('particles');
