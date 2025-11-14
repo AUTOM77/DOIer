@@ -173,7 +173,6 @@ impl Doi {
                 ));
             }
             DoiPublisher::Oxford => {
-                urls.push(format!("https://academic.oup.com/{}/pdf", self.raw));
             }
 
             // Other major Crossref publishers

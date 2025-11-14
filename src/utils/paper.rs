@@ -71,13 +71,45 @@ impl Paper {
         // Check if redirected to MDPI landing page
         let final_url = resp.url().as_str();
         eprintln!("Final URL after redirect: {}", final_url);
+
+        // Handle MDPI
         if final_url.contains("www.mdpi.com") && !final_url.ends_with("/pdf") {
             let pdf_url = format!("{}/pdf", final_url.trim_end_matches('/'));
             eprintln!("MDPI detected, trying PDF URL: {}", pdf_url);
-            let pdf_resp = self.request_pdf(&pdf_url).await?;
-            if Self::is_pdf(&pdf_resp) {
+
+            let pdf_resp = self.make_pdf_request(&pdf_url, final_url).await?;
+            eprintln!("MDPI PDF response status: {}", pdf_resp.status());
+            eprintln!("MDPI PDF content-type: {:?}", pdf_resp.headers().get("content-type"));
+
+            if pdf_resp.status().is_success() &&
+               (Self::is_pdf(&pdf_resp) || Self::is_likely_pdf(&pdf_resp)) {
                 eprintln!("PDF found at MDPI PDF URL");
                 return Self::stream_as_pdf(pdf_resp, doi);
+            } else {
+                eprintln!("MDPI response not recognized as PDF");
+            }
+        }
+
+        // Handle Oxford University Press (OUP)
+        if final_url.contains("academic.oup.com") && final_url.contains("/article/") {
+            let doi_suffix = doi.split('/').last().unwrap_or("");
+            let pdf_url = final_url
+                .replace("/article/", "/article-pdf/")
+                .trim_end_matches('/')
+                .to_string() + "/" + doi_suffix + ".pdf";
+
+            eprintln!("OUP detected, trying PDF URL: {}", pdf_url);
+
+            let pdf_resp = self.make_pdf_request(&pdf_url, final_url).await?;
+            eprintln!("OUP PDF response status: {}", pdf_resp.status());
+            eprintln!("OUP PDF content-type: {:?}", pdf_resp.headers().get("content-type"));
+
+            if pdf_resp.status().is_success() &&
+               (Self::is_pdf(&pdf_resp) || Self::is_likely_pdf(&pdf_resp)) {
+                eprintln!("PDF found at OUP PDF URL");
+                return Self::stream_as_pdf(pdf_resp, doi);
+            } else {
+                eprintln!("OUP response not recognized as PDF");
             }
         }
 
@@ -111,12 +143,51 @@ impl Paper {
             })
     }
 
+    async fn make_pdf_request(&self, url: &str, referer: &str) -> actix_web::Result<Response> {
+        self.client
+            .get(url)
+            .header(header::ACCEPT, "application/pdf,*/*")
+            .header(header::REFERER, referer)
+            .header(
+                header::USER_AGENT,
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
+                AppleWebKit/537.36 (KHTML, like Gecko) \
+                Chrome/120.0.0.0 Safari/537.36",
+            )
+            .send()
+            .await
+            .map_err(|e| {
+                eprintln!("PDF request failed: {}", e);
+                actix_web::error::ErrorBadGateway("PDF request failed")
+            })
+    }
+
     fn is_pdf(resp: &Response) -> bool {
         resp.headers()
             .get(header::CONTENT_TYPE)
             .and_then(|v| v.to_str().ok())
             .map(|ct| ct.to_ascii_lowercase().starts_with("application/pdf"))
             .unwrap_or(false)
+    }
+
+    fn is_likely_pdf(resp: &Response) -> bool {
+        // Check for PDF-like content types or URL patterns
+        let content_type = resp.headers()
+            .get(header::CONTENT_TYPE)
+            .and_then(|v| v.to_str().ok())
+            .map(|ct| ct.to_ascii_lowercase());
+
+        if let Some(ct) = content_type {
+            // Some servers return these for PDFs
+            if ct.contains("application/pdf") ||
+               ct.contains("application/octet-stream") ||
+               ct.contains("binary/octet-stream") {
+                return true;
+            }
+        }
+
+        // Check if URL ends with .pdf
+        resp.url().as_str().ends_with("/pdf") || resp.url().as_str().ends_with(".pdf")
     }
 
     fn stream_as_pdf(resp: Response, doi: &str) -> actix_web::Result<HttpResponse> {
