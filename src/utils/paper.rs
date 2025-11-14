@@ -15,14 +15,15 @@ pub struct Paper {
 impl Paper {
     pub fn new() -> Self {
         let client = Client::builder()
-            .redirect(Policy::limited(12))
-            .connect_timeout(Duration::from_secs(10))
+            .redirect(Policy::limited(20))  // Increase redirect limit for complex chains like OUP->Silverchair
+            .connect_timeout(Duration::from_secs(15))
             .timeout(Duration::from_secs(120))
             .pool_max_idle_per_host(8)
             .cookie_store(true)  // Enable cookie storage for session handling
             .gzip(true)         // Enable gzip decompression
             .brotli(true)       // Enable brotli decompression
             .deflate(true)      // Enable deflate decompression
+            .danger_accept_invalid_certs(false)
             .build()
             .expect("reqwest client");
         Self { client }
@@ -107,16 +108,42 @@ impl Paper {
 
             eprintln!("OUP detected, trying PDF URL: {}", pdf_url);
 
+            // OUP redirects to Silverchair watermark service, so we need to follow the redirects
             let pdf_resp = self.make_pdf_request(&pdf_url, final_url).await?;
+            let final_pdf_url = pdf_resp.url().as_str();
             eprintln!("OUP PDF response status: {}", pdf_resp.status());
+            eprintln!("OUP PDF final URL: {}", final_pdf_url);
             eprintln!("OUP PDF content-type: {:?}", pdf_resp.headers().get("content-type"));
 
-            if pdf_resp.status().is_success() &&
-               (Self::is_pdf(&pdf_resp) || Self::is_likely_pdf(&pdf_resp)) {
+            // Check if we got redirected to Silverchair watermark service
+            if final_pdf_url.contains("silverchair.com") && pdf_resp.status().is_success() {
+                eprintln!("OUP redirected to Silverchair watermark service");
+                if Self::is_pdf(&pdf_resp) || Self::is_likely_pdf(&pdf_resp) {
+                    eprintln!("PDF found via Silverchair redirect");
+                    return Self::stream_as_pdf(pdf_resp, doi);
+                }
+            } else if pdf_resp.status().is_success() &&
+                      (Self::is_pdf(&pdf_resp) || Self::is_likely_pdf(&pdf_resp)) {
                 eprintln!("PDF found at OUP PDF URL");
                 return Self::stream_as_pdf(pdf_resp, doi);
             } else {
-                eprintln!("OUP response not recognized as PDF");
+                eprintln!("OUP response not recognized as PDF, trying alternative approach");
+
+                // Try a different pattern for OUP URLs - sometimes the PDF is at a simpler path
+                // Extract the article ID from the URL
+                if let Some(_article_id) = final_url.split('/').last() {
+                    let alt_pdf_url = format!("{}/pdf", final_url.trim_end_matches('/'));
+                    eprintln!("Trying alternative OUP PDF URL: {}", alt_pdf_url);
+
+                    let alt_pdf_resp = self.make_pdf_request(&alt_pdf_url, final_url).await?;
+                    eprintln!("Alternative OUP PDF response status: {}", alt_pdf_resp.status());
+
+                    if alt_pdf_resp.status().is_success() &&
+                       (Self::is_pdf(&alt_pdf_resp) || Self::is_likely_pdf(&alt_pdf_resp)) {
+                        eprintln!("PDF found at alternative OUP URL");
+                        return Self::stream_as_pdf(alt_pdf_resp, doi);
+                    }
+                }
             }
         }
 
@@ -202,13 +229,30 @@ impl Paper {
             // Some servers return these for PDFs
             if ct.contains("application/pdf") ||
                ct.contains("application/octet-stream") ||
-               ct.contains("binary/octet-stream") {
+               ct.contains("binary/octet-stream") ||
+               ct.contains("application/force-download") ||
+               ct.contains("application/x-pdf") ||
+               ct.contains("application/x-download") {
                 return true;
             }
         }
 
-        // Check if URL ends with .pdf
-        resp.url().as_str().ends_with("/pdf") || resp.url().as_str().ends_with(".pdf")
+        // Check content-disposition header for PDF filename
+        if let Some(cd) = resp.headers().get(header::CONTENT_DISPOSITION) {
+            if let Ok(cd_str) = cd.to_str() {
+                if cd_str.contains(".pdf") {
+                    return true;
+                }
+            }
+        }
+
+        // Check if URL ends with .pdf or contains common PDF patterns
+        let url = resp.url().as_str();
+        url.ends_with("/pdf") ||
+        url.ends_with(".pdf") ||
+        url.contains(".pdf?") ||
+        url.contains("/pdf?") ||
+        url.contains("watermark") && url.contains(".pdf")
     }
 
     fn stream_as_pdf(resp: Response, doi: &str) -> actix_web::Result<HttpResponse> {

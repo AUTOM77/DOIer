@@ -29,6 +29,7 @@ pub async fn index() -> impl Responder {
             --accent: #f093fb;
             --dark: #1a1a2e;
             --light: #ffffff;
+            --gray-50: #fafbfc;
             --gray-100: #f8f9fa;
             --gray-200: #e9ecef;
             --gray-300: #dee2e6;
@@ -270,35 +271,42 @@ pub async fn index() -> impl Responder {
 
         .input-wrapper {
             position: relative;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .input-icon {
             position: absolute;
-            left: 1.25rem;
+            left: 1.5rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--gray-500);
+            color: var(--primary);
+            font-size: 1.5rem;
+            z-index: 1;
         }
 
         input[type="text"] {
             width: 100%;
-            padding: 1.25rem 1.25rem 1.25rem 3.5rem;
-            border: 2px solid var(--gray-300);
-            border-radius: 16px;
-            font-size: 1.1rem;
+            padding: 1.75rem 1.75rem 1.75rem 4rem;
+            border: 3px solid transparent;
+            border-radius: 20px;
+            font-size: 1.25rem;
             transition: all 0.3s;
-            background: var(--light);
+            background: linear-gradient(white, white) padding-box,
+                        linear-gradient(135deg, var(--primary), var(--secondary)) border-box;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.1);
+            font-weight: 500;
         }
 
         input[type="text"]:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15),
+                        0 15px 40px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
         }
 
         input[type="text"]::placeholder {
-            color: var(--gray-500);
+            color: var(--gray-400);
+            font-weight: 400;
         }
 
         .button-group {
@@ -308,15 +316,16 @@ pub async fn index() -> impl Responder {
 
         button {
             flex: 1;
-            padding: 1rem 2rem;
+            padding: 1.25rem 2.5rem;
             border: none;
-            border-radius: 12px;
-            font-size: 1.05rem;
-            font-weight: 600;
+            border-radius: 14px;
+            font-size: 1.15rem;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
+            letter-spacing: 0.5px;
         }
 
         button::before {
@@ -514,49 +523,52 @@ pub async fn index() -> impl Responder {
             font-size: 1.1rem;
         }
 
-        /* Examples Section */
-        .examples {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 2rem;
-            margin: 2rem auto;
-            max-width: 700px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        /* Examples Section - Inline Version */
+        .examples-inline {
+            margin: 0.75rem 0 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
 
-        .examples h3 {
-            color: white;
-            margin-bottom: 1.5rem;
-            font-size: 1.2rem;
+        .examples-label {
+            color: var(--gray-500);
+            font-size: 0.7rem;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            text-align: center;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
         .examples-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.75rem;
-            justify-content: center;
+            gap: 0.3rem;
+            align-items: center;
         }
 
         .example-item {
-            padding: 0.75rem 1.25rem;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 50px;
-            font-size: 0.9rem;
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            background: var(--gray-100);
+            border-radius: 4px;
+            font-size: 0.7rem;
             cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
+            transition: all 0.2s;
+            border: 1px solid var(--gray-200);
             font-weight: 500;
+            color: var(--gray-600);
+            font-family: 'Courier New', monospace;
+            white-space: nowrap;
+            line-height: 1.2;
         }
 
         .example-item:hover {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: var(--primary);
             color: white;
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            border-color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.15);
         }
 
         /* API Section */
@@ -718,9 +730,7 @@ pub async fn index() -> impl Responder {
             <div class="logo">DOI Paper Downloader</div>
             <ul class="nav-links">
                 <li><a href="#home" onclick="return handleNavClick(event, 'home')">Home</a></li>
-                <li><a href="#features" onclick="return handleNavClick(event, 'features')">Features</a></li>
                 <li><a href="#api" onclick="return handleNavClick(event, 'api')">API</a></li>
-                <li><a href="#about" onclick="return handleNavClick(event, 'about')">About</a></li>
             </ul>
         </div>
     </nav>
@@ -754,6 +764,14 @@ pub async fn index() -> impl Responder {
                             />
                         </div>
 
+                        <!-- Examples moved inside form -->
+                        <div class="examples-inline">
+                            <span class="examples-label">Examples:</span>
+                            <div class="examples-grid">
+                                {{EXAMPLE_DOIS}}
+                            </div>
+                        </div>
+
                         <div class="button-group">
                             <button type="submit" class="btn-primary">
                                 <span>Download PDF</span>
@@ -765,14 +783,6 @@ pub async fn index() -> impl Responder {
                     </form>
 
                     <div id="status" class="status"></div>
-                </div>
-
-                <!-- Examples -->
-                <div class="examples">
-                    <h3>Try Example DOIs</h3>
-                    <div class="examples-grid">
-                        {{EXAMPLE_DOIS}}
-                    </div>
                 </div>
             </div>
 
@@ -877,16 +887,18 @@ pub async fn index() -> impl Responder {
         <div class="footer-content">
             <div class="footer-links">
                 <a href="#home" onclick="return handleNavClick(event, 'home')">Home</a>
-                <a href="#features" onclick="return handleNavClick(event, 'features')">Features</a>
                 <a href="#api" onclick="return handleNavClick(event, 'api')">API</a>
                 <a href="https://github.com" target="_blank">GitHub</a>
                 <a href="mailto:contact@example.com">Contact</a>
             </div>
-            <p>© 2024 DOI Paper Downloader. Built with passion for open science.</p>
+            <p id="copyright">© 2024 DOI Paper Downloader. Built with passion for open science.</p>
         </div>
     </footer>
 
     <script>
+        // Update copyright year
+        document.getElementById('copyright').textContent = `© ${new Date().getFullYear()} DOI Paper Downloader. Built with passion for open science.`;
+
         // Particle Animation
         const particlesContainer = document.getElementById('particles');
         const particleCount = 20;
