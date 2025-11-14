@@ -436,7 +436,7 @@ curl "http://localhost:8080/v1/doi/10.1038/nature12373" \
 <!-- PAGE_SCRIPTS -->
 <script>
     // Fill DOI input with example and download
-    function fillDOI(doi) {
+    window.fillDOI = function(doi) {
         document.getElementById('doiInput').value = doi;
         document.getElementById('doiInput').focus();
         // Automatically trigger download after filling
@@ -517,7 +517,7 @@ curl "http://localhost:8080/v1/doi/10.1038/nature12373" \
     }
 
     // Handle download
-    async function handleDownload() {
+    window.handleDownload = async function() {
         const doi = document.getElementById('doiInput').value.trim();
 
         if (!doi) {
