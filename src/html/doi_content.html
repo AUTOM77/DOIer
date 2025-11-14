@@ -529,7 +529,7 @@ curl "http://localhost:8080/v1/doi/10.1038/nature12373" \
         showMessage('Fetching paper...', 'info');
 
         try {
-            const response = await fetch(`/v1/doi/${encodeURIComponent(doi)}`);
+            const response = await fetch(`/v1/doi/${doi}`);
 
             if (!response.ok) {
                 throw new Error(`Error: ${response.status}`);
