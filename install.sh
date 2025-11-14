@@ -128,8 +128,8 @@ if sudo systemctl is-active --quiet "${SERVICE_NAME}.service"; then
     echo "✓ Installation complete!"
     echo "  Version: $VERSION"
     echo "  Service: Running on port ${PORT}"
-    echo "  Status:  systemctl status ${SERVICE_NAME}"
-    echo "  Logs:    journalctl -u ${SERVICE_NAME} -f"
+    echo "  Status:  sudo systemctl status ${SERVICE_NAME}"
+    echo "  Logs:    sudo journalctl -u ${SERVICE_NAME} -f"
 else
     echo "Error: Service failed to start. Check: journalctl -u ${SERVICE_NAME}"
     exit 1
