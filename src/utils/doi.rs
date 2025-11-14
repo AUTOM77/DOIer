@@ -123,8 +123,6 @@ impl Doi {
                 urls.push(format!("https://dl.acm.org/doi/pdf/{}", self.raw));
             }
             DoiPublisher::Ieee => {
-                // IEEE DOI format: 10.1109/5.771073 -> arnumber is 771073
-                // PDF URL: https://ieeexplore.ieee.org/stampPDF/getPDF.jsp?tp=&arnumber=771073
                 let parts: Vec<&str> = self.raw.split('/').collect();
                 if let Some(last_part) = parts.last() {
                     if let Some(arnumber) = last_part.split('.').last() {
@@ -138,9 +136,7 @@ impl Doi {
             DoiPublisher::Springer => {
                 urls.push(format!("https://link.springer.com/content/pdf/{}.pdf", self.raw));
             }
-            DoiPublisher::Elsevier => {
-                // ScienceDirect not supported - requires PII extraction from HTML
-            }
+            DoiPublisher::Elsevier => {}
             DoiPublisher::Wiley => {
                 urls.push(format!("https://onlinelibrary.wiley.com/doi/pdfdirect/{}?download=true", self.raw));
             }
@@ -172,10 +168,7 @@ impl Doi {
                     self.raw
                 ));
             }
-            DoiPublisher::Oxford => {
-            }
-
-            // Other major Crossref publishers
+            DoiPublisher::Oxford => {}
             DoiPublisher::ScienceAaas => {
                 urls.push(format!("https://www.science.org/doi/pdf/{}", self.raw));
             }
@@ -199,13 +192,8 @@ impl Doi {
                 urls.push(format!("https://karger.com/Article/Pdf/{}", self.raw));
             }
 
-            // Large open-access publishers
-            DoiPublisher::Mdpi => {
-                // MDPI handled via DOI redirect + /pdf appending in paper.rs
-                // No direct URL generation needed
-            }
+            DoiPublisher::Mdpi => {}
             DoiPublisher::Hindawi => {
-                // Hindawi now hosted on Wiley Online Library
                 urls.push(format!("https://onlinelibrary.wiley.com/doi/pdfdirect/{}?download=true", self.raw));
             }
             DoiPublisher::Frontiers => {
@@ -216,7 +204,6 @@ impl Doi {
                     self.raw.split('/').nth(1).unwrap_or("")));
             }
 
-            // Government / international orgs
             DoiPublisher::Who => {
                 urls.push(format!("https://apps.who.int/iris/bitstream/handle/{}/pdf",
                     self.raw.replace("10.2471/", "")));
@@ -233,7 +220,6 @@ impl Doi {
                 urls.push(format!("https://data.europa.eu/doi/{}.pdf", self.raw));
             }
 
-            // Preprint and repository services
             DoiPublisher::Zenodo => {
                 if let Some(record_id) = self.raw.strip_prefix("10.5281/zenodo.") {
                     urls.push(format!("https://zenodo.org/record/{}/files/article.pdf", record_id));
@@ -257,7 +243,6 @@ impl Doi {
                 }
             }
 
-            // Large Asian publishers
             DoiPublisher::Jstage => {
                 urls.push(format!("https://www.jstage.jst.go.jp/article/{}/pdf", self.raw));
             }

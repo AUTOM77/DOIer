@@ -1,7 +1,14 @@
-use actix_web::{get, HttpResponse, Responder};
+use actix_web::{get, HttpResponse, Responder, http};
 use crate::config::constant::{EXAMPLE_DOIS, SERVICE_NAME, SERVICE_DESCRIPTION, SERVICE_TITLE};
 
 #[get("/")]
+pub async fn root_redirect() -> impl Responder {
+    HttpResponse::Found()
+        .append_header((http::header::LOCATION, "/doi"))
+        .finish()
+}
+
+#[get("/doi")]
 pub async fn index() -> impl Responder {
     let examples_html = EXAMPLE_DOIS
         .iter()
