@@ -5,21 +5,20 @@ pub const EXAMPLE_DOIS: &[&str] = &[
 
     // Open access publishers
     "10.1371/journal.pone.0123456",        // PLOS
-    "10.3390/molecules26010001",            // MDPI
     "10.3389/fpsyg.2020.00001",            // Frontiers
-    "10.1155/2020/1234567",                // Hindawi
+    "10.1155/2021/5553425",                // Hindawi
 
     // Traditional publishers
-    "10.1007/s00Nature-020-12345-6",       // Springer
-    "10.1111/j.1467-8624.2020.01234.x",    // Wiley
-    "10.1093/nar/gkaa123",                 // Oxford
-    "10.1017/S0140525X20001234",           // Cambridge
+    "10.1007/s10651-007-0043-y",           // Springer
+    "10.1111/risa.12398",                  // Wiley
+    "10.1093/nar/gkz1031",                 // Oxford
+    "10.1017/S0140525X00077577",           // Cambridge
 
     // Scientific societies
     "10.1109/5.771073",                     // IEEE
     "10.1145/3180155.3180160",             // ACM
-    "10.1103/PhysRevLett.120.123456",      // APS (Physical Review)
-    "10.1021/acs.jcim.0c01234",            // ACS (American Chemical Society)
+    "10.1103/PhysRevLett.53.1260",         // APS (Physical Review)
+    "10.1021/acs.jcim.9b00725",            // ACS (American Chemical Society)
 
     // Preprints
     "10.48550/arXiv.2301.00001",           // ArXiv

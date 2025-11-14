@@ -202,12 +202,12 @@ impl Doi {
 
             // Large open-access publishers
             DoiPublisher::Mdpi => {
-                urls.push(format!("https://www.mdpi.com/{}/pdf",
-                    self.raw.replace("10.3390/", "")));
+                // MDPI not supported - requires journal ISSN mapping and complex DOI parsing
+                // Example: 10.3390/molecules26010001 -> https://www.mdpi.com/1420-3049/26/1/1/pdf
             }
             DoiPublisher::Hindawi => {
-                urls.push(format!("https://downloads.hindawi.com/journals/{}.pdf",
-                    self.raw.replace("10.1155/", "").replace("/", ".")));
+                // Hindawi now hosted on Wiley Online Library
+                urls.push(format!("https://onlinelibrary.wiley.com/doi/epdf/{}", self.raw));
             }
             DoiPublisher::Frontiers => {
                 urls.push(format!("https://www.frontiersin.org/articles/{}/pdf", self.raw));
