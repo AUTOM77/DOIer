@@ -3,6 +3,7 @@ use futures_util::TryStreamExt as _;
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use reqwest::{header, redirect::Policy, Client, Response};
 use std::time::Duration;
+use tokio::time::sleep;
 
 use super::doi::Doi;
 
@@ -18,7 +19,10 @@ impl Paper {
             .connect_timeout(Duration::from_secs(10))
             .timeout(Duration::from_secs(120))
             .pool_max_idle_per_host(8)
-            .cookie_store(true)  // Enable cookie storage for IEEE session handling
+            .cookie_store(true)  // Enable cookie storage for session handling
+            .gzip(true)         // Enable gzip decompression
+            .brotli(true)       // Enable brotli decompression
+            .deflate(true)      // Enable deflate decompression
             .build()
             .expect("reqwest client");
         Self { client }
@@ -77,6 +81,9 @@ impl Paper {
             let pdf_url = format!("{}/pdf", final_url.trim_end_matches('/'));
             eprintln!("MDPI detected, trying PDF URL: {}", pdf_url);
 
+            // Small delay to avoid bot detection
+            sleep(Duration::from_millis(500)).await;
+
             let pdf_resp = self.make_pdf_request(&pdf_url, final_url).await?;
             eprintln!("MDPI PDF response status: {}", pdf_resp.status());
             eprintln!("MDPI PDF content-type: {:?}", pdf_resp.headers().get("content-type"));
@@ -122,19 +129,23 @@ impl Paper {
     async fn request_pdf(&self, url: &str) -> actix_web::Result<Response> {
         self.client
             .get(url)
-            .header(header::ACCEPT, "application/pdf")
+            .header(header::ACCEPT, "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
+            .header(header::ACCEPT_ENCODING, "gzip, deflate, br")
+            .header(header::ACCEPT_LANGUAGE, "en-US,en;q=0.9")
             .header(
                 header::USER_AGENT,
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
                 AppleWebKit/537.36 (KHTML, like Gecko) \
                 Chrome/120.0.0.0 Safari/537.36",
             )
-            .header(
-                "Sec-CH-UA",
-                "\"Chromium\";v=120, \"Google Chrome\";v=120, \"Not:A-Brand\";v=99",
-            )
-            .header("Sec-CH-UA-Mobile", "?0")
-            .header("Sec-CH-UA-Platform", "\"Windows\"")
+            .header("Sec-Ch-Ua", "\"Not_A Brand\";v=\"8\", \"Chromium\";v=\"120\", \"Google Chrome\";v=\"120\"")
+            .header("Sec-Ch-Ua-Mobile", "?0")
+            .header("Sec-Ch-Ua-Platform", "\"Windows\"")
+            .header("Sec-Fetch-Dest", "document")
+            .header("Sec-Fetch-Mode", "navigate")
+            .header("Sec-Fetch-Site", "none")
+            .header("Sec-Fetch-User", "?1")
+            .header("Upgrade-Insecure-Requests", "1")
             .send()
             .await
             .map_err(|e| {
@@ -146,7 +157,9 @@ impl Paper {
     async fn make_pdf_request(&self, url: &str, referer: &str) -> actix_web::Result<Response> {
         self.client
             .get(url)
-            .header(header::ACCEPT, "application/pdf,*/*")
+            .header(header::ACCEPT, "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
+            .header(header::ACCEPT_ENCODING, "gzip, deflate, br")
+            .header(header::ACCEPT_LANGUAGE, "en-US,en;q=0.9")
             .header(header::REFERER, referer)
             .header(
                 header::USER_AGENT,
@@ -154,6 +167,14 @@ impl Paper {
                 AppleWebKit/537.36 (KHTML, like Gecko) \
                 Chrome/120.0.0.0 Safari/537.36",
             )
+            .header("Sec-Ch-Ua", "\"Not_A Brand\";v=\"8\", \"Chromium\";v=\"120\", \"Google Chrome\";v=\"120\"")
+            .header("Sec-Ch-Ua-Mobile", "?0")
+            .header("Sec-Ch-Ua-Platform", "\"Windows\"")
+            .header("Sec-Fetch-Dest", "document")
+            .header("Sec-Fetch-Mode", "navigate")
+            .header("Sec-Fetch-Site", "same-origin")
+            .header("Sec-Fetch-User", "?1")
+            .header("Upgrade-Insecure-Requests", "1")
             .send()
             .await
             .map_err(|e| {

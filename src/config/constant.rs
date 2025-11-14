@@ -13,7 +13,6 @@ pub const EXAMPLE_DOIS: &[&str] = &[
     "10.1007/s10651-007-0043-y",           // Springer
     "10.1111/risa.12398",                  // Wiley
     "10.1093/nar/gkz1031",                 // Oxford
-    "10.1017/S0140525X00077577",           // Cambridge
 
     // Scientific societies
     "10.1109/5.771073",                     // IEEE
