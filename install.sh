@@ -58,8 +58,18 @@ echo "Detected: $ARCH (target: $TARGET)"
 RELEASE_URL="https://api.github.com/repos/${GITHUB_REPO}/releases/latest"
 echo "Fetching latest release info..."
 
+RELEASE_INFO=$(curl -s "$RELEASE_URL")
+VERSION=$(echo "$RELEASE_INFO" | grep '"tag_name":' | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/')
+
+if [ -z "$VERSION" ]; then
+    echo "Error: Could not fetch version information"
+    exit 1
+fi
+
+echo "Latest version: $VERSION"
+
 BINARY_NAME="${SERVICE_NAME}-${TARGET}"
-DOWNLOAD_URL=$(curl -s "$RELEASE_URL" | grep "browser_download_url.*${BINARY_NAME}" | cut -d '"' -f 4 | head -n 1)
+DOWNLOAD_URL=$(echo "$RELEASE_INFO" | grep "browser_download_url.*${BINARY_NAME}" | cut -d '"' -f 4 | head -n 1)
 
 if [ -z "$DOWNLOAD_URL" ]; then
     echo "Error: Could not find binary '${BINARY_NAME}' in latest release"
@@ -115,7 +125,11 @@ sudo systemctl start "${SERVICE_NAME}.service"
 sleep 2
 
 if sudo systemctl is-active --quiet "${SERVICE_NAME}.service"; then
-    echo "✓ Installation complete. Service running on port ${PORT}"
+    echo "✓ Installation complete!"
+    echo "  Version: $VERSION"
+    echo "  Service: Running on port ${PORT}"
+    echo "  Status:  systemctl status ${SERVICE_NAME}"
+    echo "  Logs:    journalctl -u ${SERVICE_NAME} -f"
 else
     echo "Error: Service failed to start. Check: journalctl -u ${SERVICE_NAME}"
     exit 1
