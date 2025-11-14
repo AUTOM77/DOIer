@@ -2,7 +2,6 @@ use actix_web::{get, HttpResponse, Responder};
 use crate::config::constant::{SERVICE_NAME, SERVICE_DESCRIPTION, SERVICE_TITLE};
 use crate::templates::generate_examples_html;
 
-// Include HTML files at compile time
 const INDEX_HTML: &str = include_str!("../html/index.html");
 const DOI_HTML: &str = include_str!("../html/doi.html");
 
