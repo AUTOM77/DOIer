@@ -23,6 +23,104 @@ pub async fn index() -> impl Responder {
             box-sizing: border-box;
         }
 
+        /* Progress Bar */
+        .progress-bar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .progress-bar-container.active {
+            opacity: 1;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9998;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            min-width: 300px;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            opacity: 0;
+            transform: translateX(400px);
+            animation: slideInFromRight 0.4s forwards;
+            pointer-events: all;
+        }
+
+        @keyframes slideInFromRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOutToRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(400px);
+            }
+        }
+
+        .toast.hiding {
+            animation: slideOutToRight 0.4s forwards;
+        }
+
+        .toast-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .toast-message {
+            flex: 1;
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+
+        .toast.success .toast-icon {
+            color: #00b894;
+        }
+
+        .toast.error .toast-icon {
+            color: #ff6b6b;
+        }
+
+        .toast.info .toast-icon {
+            color: #74b9ff;
+        }
+
         :root {
             --primary: #667eea;
             --secondary: #764ba2;
@@ -223,17 +321,17 @@ pub async fn index() -> impl Responder {
 
         /* Search Card */
         .search-card {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 2.5rem;
-            max-width: 700px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 1000px;
             margin: 0 auto 4rem;
             box-shadow:
-                0 30px 60px rgba(0, 0, 0, 0.12),
-                0 10px 20px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+                0 20px 40px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             animation: fadeInUp 1.2s ease;
         }
 
@@ -247,7 +345,7 @@ pub async fn index() -> impl Responder {
             left: 1.5rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--primary);
+            color: rgba(255, 255, 255, 0.7);
             font-size: 1.5rem;
             z-index: 1;
         }
@@ -255,25 +353,32 @@ pub async fn index() -> impl Responder {
         input[type="text"] {
             width: 100%;
             padding: 1.75rem 1.75rem 1.75rem 4rem;
-            border: 3px solid transparent;
-            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
             font-size: 1.25rem;
             transition: all 0.3s;
-            background: linear-gradient(white, white) padding-box,
-                        linear-gradient(135deg, var(--primary), var(--secondary)) border-box;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            box-shadow:
+                0 4px 20px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
             font-weight: 500;
+            color: white;
         }
 
         input[type="text"]:focus {
             outline: none;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15),
-                        0 15px 40px rgba(102, 126, 234, 0.2);
-            transform: translateY(-2px);
+            border-color: rgba(102, 126, 234, 0.5);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow:
+                0 0 0 4px rgba(102, 126, 234, 0.1),
+                0 8px 30px rgba(102, 126, 234, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
         }
 
         input[type="text"]::placeholder {
-            color: var(--gray-400);
+            color: rgba(255, 255, 255, 0.5);
             font-weight: 400;
         }
 
@@ -315,73 +420,42 @@ pub async fn index() -> impl Responder {
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
             color: white;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
         }
 
         .btn-secondary {
-            background: var(--gray-100);
-            color: var(--gray-700);
-            border: 2px solid var(--gray-300);
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
         }
 
         .btn-secondary:hover {
-            background: var(--gray-200);
-            border-color: var(--gray-400);
-        }
-
-        /* Status Messages */
-        .status {
-            margin-top: 1.5rem;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            display: none;
-            animation: slideIn 0.4s ease;
-            font-weight: 500;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .status.success {
-            background: linear-gradient(135deg, #00b894, #00cec9);
-            color: white;
-        }
-
-        .status.error {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            color: white;
-        }
-
-        .status.info {
-            background: linear-gradient(135deg, #74b9ff, #0984e3);
-            color: white;
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
         }
 
         /* Examples Section - Inline Version */
         .examples-inline {
-            margin: 0.75rem 0 1.25rem;
+            margin: 1rem 0 1.5rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
         }
 
         .examples-label {
-            color: var(--gray-500);
+            color: rgba(255, 255, 255, 0.6);
             font-size: 0.7rem;
             font-weight: 600;
             text-transform: uppercase;
@@ -398,26 +472,27 @@ pub async fn index() -> impl Responder {
 
         .example-item {
             display: inline-block;
-            padding: 0.2rem 0.5rem;
-            background: var(--gray-100);
-            border-radius: 4px;
+            padding: 0.25rem 0.6rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
             font-size: 0.7rem;
             cursor: pointer;
             transition: all 0.2s;
-            border: 1px solid var(--gray-200);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             font-weight: 500;
-            color: var(--gray-600);
+            color: rgba(255, 255, 255, 0.8);
             font-family: 'Courier New', monospace;
             white-space: nowrap;
             line-height: 1.2;
+            backdrop-filter: blur(10px);
         }
 
         .example-item:hover {
-            background: var(--primary);
+            background: rgba(102, 126, 234, 0.3);
             color: white;
-            border-color: var(--primary);
+            border-color: rgba(102, 126, 234, 0.4);
             transform: translateY(-1px);
-            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.15);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
         }
 
         /* API Section */
@@ -428,21 +503,29 @@ pub async fn index() -> impl Responder {
         }
 
         .api-card {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             border-radius: 20px;
             padding: 3rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         .api-card h3 {
             font-size: 1.8rem;
             margin-bottom: 2rem;
-            color: var(--gray-900);
+            color: white;
+        }
+
+        .api-card p {
+            color: rgba(255, 255, 255, 0.8) !important;
         }
 
         .code-block {
-            background: #1e1e2e;
+            background: rgba(0, 0, 0, 0.4);
             color: #a6e3a1;
             padding: 1.5rem;
             border-radius: 12px;
@@ -450,6 +533,8 @@ pub async fn index() -> impl Responder {
             margin-bottom: 1.5rem;
             position: relative;
             overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
         }
 
         .code-block::before {
@@ -475,24 +560,6 @@ pub async fn index() -> impl Responder {
         .footer-content {
             max-width: 1200px;
             margin: 0 auto;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 3rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .footer-links a {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .footer-links a:hover {
-            color: white;
         }
 
         /* Responsive Design */
@@ -569,6 +636,14 @@ pub async fn index() -> impl Responder {
     </style>
 </head>
 <body>
+    <!-- Progress Bar -->
+    <div class="progress-bar-container" id="progressBarContainer">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <!-- Background Elements -->
     <div class="background"></div>
     <div class="particles" id="particles"></div>
@@ -622,8 +697,6 @@ pub async fn index() -> impl Responder {
                             </button>
                         </div>
                     </form>
-
-                    <div id="status" class="status"></div>
                 </div>
             </div>
 
@@ -658,12 +731,6 @@ pub async fn index() -> impl Responder {
     <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <div class="footer-links">
-                <a href="#home" onclick="return handleNavClick(event, 'home')">Home</a>
-                <a href="#api" onclick="return handleNavClick(event, 'api')">API</a>
-                <a href="https://github.com" target="_blank">GitHub</a>
-                <a href="mailto:contact@example.com">Contact</a>
-            </div>
             <p id="copyright">© 2024 {{SERVICE_NAME}}. Built with passion for open science.</p>
         </div>
     </footer>
@@ -710,10 +777,59 @@ pub async fn index() -> impl Responder {
             return false;
         }
 
+        // Notification System
+        function showToast(message, type) {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️'
+            };
+
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type]}</div>
+                <div class="toast-message">${message}</div>
+            `;
+
+            toastContainer.appendChild(toast);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => {
+                    toast.remove();
+                }, 400);
+            }, 5000);
+        }
+
+        // Progress Bar
+        function showProgress(percent) {
+            const progressBarContainer = document.getElementById('progressBarContainer');
+            const progressBar = document.getElementById('progressBar');
+
+            if (percent === 0) {
+                progressBarContainer.classList.remove('active');
+                progressBar.style.width = '0%';
+            } else if (percent === 100) {
+                progressBar.style.width = '100%';
+                setTimeout(() => {
+                    progressBarContainer.classList.remove('active');
+                    setTimeout(() => {
+                        progressBar.style.width = '0%';
+                    }, 300);
+                }, 500);
+            } else {
+                progressBarContainer.classList.add('active');
+                progressBar.style.width = percent + '%';
+            }
+        }
+
         // Form handling
         const doiForm = document.getElementById('doiForm');
         const doiInput = document.getElementById('doiInput');
-        const statusDiv = document.getElementById('status');
 
         doiForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -721,23 +837,27 @@ pub async fn index() -> impl Responder {
             const doi = doiInput.value.trim();
 
             if (!doi) {
-                showStatus('Please enter a DOI', 'error');
+                showToast('Please enter a DOI', 'error');
                 return;
             }
 
             if (!doi.startsWith('10.') || !doi.includes('/')) {
-                showStatus('Invalid DOI format. Must start with "10." and contain "/"', 'error');
+                showToast('Invalid DOI format. Must start with "10." and contain "/"', 'error');
                 return;
             }
 
-            showStatus('Fetching paper...', 'info');
+            showToast('Fetching paper...', 'info');
+            showProgress(30);
 
             try {
                 const url = `/v1/doi/${doi}`;
+                showProgress(60);
                 const response = await fetch(url);
+                showProgress(80);
 
                 if (response.ok) {
                     const blob = await response.blob();
+                    showProgress(90);
                     const downloadUrl = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = downloadUrl;
@@ -746,27 +866,18 @@ pub async fn index() -> impl Responder {
                     a.click();
                     window.URL.revokeObjectURL(downloadUrl);
                     document.body.removeChild(a);
-                    showStatus('PDF downloaded successfully!', 'success');
+                    showProgress(100);
+                    showToast('PDF downloaded successfully!', 'success');
                 } else {
+                    showProgress(0);
                     const errorText = await response.text();
-                    showStatus(`Error: ${errorText || response.statusText}`, 'error');
+                    showToast(`Error: ${errorText || response.statusText}`, 'error');
                 }
             } catch (error) {
-                showStatus(`Error: ${error.message}`, 'error');
+                showProgress(0);
+                showToast(`Error: ${error.message}`, 'error');
             }
         });
-
-        function showStatus(message, type) {
-            statusDiv.textContent = message;
-            statusDiv.className = `status ${type}`;
-            statusDiv.style.display = 'block';
-
-            if (type === 'success') {
-                setTimeout(() => {
-                    statusDiv.style.display = 'none';
-                }, 5000);
-            }
-        }
 
         function fillDOI(doi) {
             doiInput.value = doi;
@@ -780,8 +891,8 @@ pub async fn index() -> impl Responder {
 
         function clearForm() {
             doiInput.value = '';
-            statusDiv.style.display = 'none';
             doiInput.focus();
+            showProgress(0);
         }
 
         // Add pulse animation for input focus
