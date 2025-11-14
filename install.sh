@@ -15,6 +15,27 @@ if [ "$(uname -s)" != "Linux" ]; then
     exit 1
 fi
 
+echo "Checking for existing installation..."
+if sudo systemctl is-active --quiet "${SERVICE_NAME}.service" 2>/dev/null; then
+    echo "Stopping existing service..."
+    sudo systemctl stop "${SERVICE_NAME}.service"
+fi
+
+if sudo systemctl is-enabled --quiet "${SERVICE_NAME}.service" 2>/dev/null; then
+    echo "Disabling existing service..."
+    sudo systemctl disable "${SERVICE_NAME}.service"
+fi
+
+if [ -f "${SERVICE_FILE}" ]; then
+    echo "Removing old service file..."
+    sudo rm -f "${SERVICE_FILE}"
+fi
+
+if [ -f "${INSTALL_DIR}/${SERVICE_NAME}" ]; then
+    echo "Removing old binary..."
+    sudo rm -f "${INSTALL_DIR}/${SERVICE_NAME}"
+fi
+
 echo "Detecting system architecture..."
 ARCH=$(uname -m)
 
