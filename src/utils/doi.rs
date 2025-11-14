@@ -150,7 +150,9 @@ impl Doi {
                 urls.push(format!("https://onlinelibrary.wiley.com/doi/pdf/{}", self.raw));
             }
             DoiPublisher::Nature => {
-                urls.push(format!("https://www.nature.com/articles/{}.pdf", self.raw));
+                if let Some(article_id) = self.raw.split('/').nth(1) {
+                    urls.push(format!("https://www.nature.com/articles/{}.pdf", article_id));
+                }
             }
             DoiPublisher::Plos => {
                 urls.push(format!(
