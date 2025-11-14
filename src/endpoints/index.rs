@@ -1,5 +1,5 @@
 use actix_web::{get, HttpResponse, Responder};
-use crate::config::constant::{EXAMPLE_DOIS, SERVICE_NAME, SERVICE_DESCRIPTION};
+use crate::config::constant::{EXAMPLE_DOIS, SERVICE_NAME, SERVICE_DESCRIPTION, SERVICE_TITLE};
 
 #[get("/")]
 pub async fn index() -> impl Responder {
@@ -14,8 +14,8 @@ pub async fn index() -> impl Responder {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOI Paper Downloader - Instant Research Paper Access</title>
-    <meta name="description" content="Download research papers instantly using DOI. Fast, reliable, and free academic paper downloader.">
+    <title>{{SERVICE_NAME}} - {{SERVICE_TITLE}}</title>
+    <meta name="description" content="{{SERVICE_DESCRIPTION}} Download research papers instantly using DOI.">
     <style>
         * {
             margin: 0;
@@ -227,7 +227,7 @@ pub async fn index() -> impl Responder {
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-radius: 24px;
-            padding: 3rem;
+            padding: 2.5rem;
             max-width: 700px;
             margin: 0 auto 4rem;
             box-shadow:
@@ -235,38 +235,6 @@ pub async fn index() -> impl Responder {
                 0 10px 20px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.5);
             animation: fadeInUp 1.2s ease;
-        }
-
-        .search-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .search-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .search-title {
-            flex: 1;
-        }
-
-        .search-title h2 {
-            font-size: 1.5rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .search-title p {
-            color: var(--gray-600);
-            font-size: 0.95rem;
         }
 
         .input-wrapper {
@@ -402,125 +370,6 @@ pub async fn index() -> impl Responder {
         .status.info {
             background: linear-gradient(135deg, #74b9ff, #0984e3);
             color: white;
-        }
-
-        /* Features Section */
-        .features {
-            padding: 4rem 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 4rem;
-        }
-
-        .section-title h2 {
-            font-size: clamp(2rem, 4vw, 3rem);
-            margin-bottom: 1rem;
-            color: white;
-        }
-
-        .section-title p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.2rem;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-            margin-bottom: 4rem;
-        }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 2.5rem;
-            transition: all 0.4s;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            transform: scaleX(0);
-            transition: transform 0.3s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .feature-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .feature-icon {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .feature-card h3 {
-            font-size: 1.4rem;
-            margin-bottom: 1rem;
-            color: var(--gray-900);
-        }
-
-        .feature-card p {
-            color: var(--gray-600);
-            line-height: 1.8;
-        }
-
-        /* Statistics Section */
-        .stats {
-            padding: 4rem 2rem;
-            text-align: center;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: white;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.1rem;
         }
 
         /* Examples Section - Inline Version */
@@ -727,7 +576,7 @@ pub async fn index() -> impl Responder {
     <!-- Navigation -->
     <nav id="navbar">
         <div class="nav-container">
-            <div class="logo">DOI Paper Downloader</div>
+            <div class="logo">{{SERVICE_NAME}}</div>
             <ul class="nav-links">
                 <li><a href="#home" onclick="return handleNavClick(event, 'home')">Home</a></li>
                 <li><a href="#api" onclick="return handleNavClick(event, 'api')">API</a></li>
@@ -740,19 +589,11 @@ pub async fn index() -> impl Responder {
         <!-- Hero Section -->
         <section class="hero" id="home">
             <div class="hero-content">
-                <h1>Access Research Papers Instantly</h1>
-                <p class="hero-subtitle">Transform any DOI into a downloadable PDF in seconds. Simple, fast, and reliable.</p>
+                <h1>{{SERVICE_TITLE}}</h1>
+                <p class="hero-subtitle">{{SERVICE_DESCRIPTION}}</p>
 
                 <!-- Search Card -->
                 <div class="search-card">
-                    <div class="search-header">
-                        <div class="search-icon">🔍</div>
-                        <div class="search-title">
-                            <h2>Download Papers</h2>
-                            <p>Enter a DOI to get started</p>
-                        </div>
-                    </div>
-
                     <form id="doiForm">
                         <div class="input-wrapper">
                             <span class="input-icon">📄</span>
@@ -774,7 +615,7 @@ pub async fn index() -> impl Responder {
 
                         <div class="button-group">
                             <button type="submit" class="btn-primary">
-                                <span>Download PDF</span>
+                                <span>Download</span>
                             </button>
                             <button type="button" class="btn-secondary" onclick="clearForm()">
                                 Clear
@@ -790,74 +631,6 @@ pub async fn index() -> impl Responder {
                 <svg viewBox="0 0 24 24">
                     <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
                 </svg>
-            </div>
-        </section>
-
-        <!-- Features Section -->
-        <section class="features" id="features">
-            <div class="section-title">
-                <h2>Why Choose Our Service?</h2>
-                <p>Fast, reliable, and designed for researchers</p>
-            </div>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3>Lightning Fast</h3>
-                    <p>Get your papers in seconds. Our optimized infrastructure ensures rapid downloads without compromising quality.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">🔒</div>
-                    <h3>Secure & Private</h3>
-                    <p>Your searches are private. We don't track or store your download history, ensuring complete confidentiality.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">🌍</div>
-                    <h3>Global Access</h3>
-                    <p>Access research from publishers worldwide. Supporting all major academic databases and repositories.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">🔧</div>
-                    <h3>Developer Friendly</h3>
-                    <p>Simple REST API for seamless integration. Build your own tools with our robust and well-documented endpoints.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">📱</div>
-                    <h3>Mobile Ready</h3>
-                    <p>Works perfectly on all devices. Download papers on the go from your phone, tablet, or desktop.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">💯</div>
-                    <h3>Free Forever</h3>
-                    <p>No hidden fees, no subscriptions. Access to knowledge should be universal and unrestricted.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Statistics -->
-        <section class="stats">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number">1M+</div>
-                    <div class="stat-label">Papers Downloaded</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">99.9%</div>
-                    <div class="stat-label">Uptime</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">< 2s</div>
-                    <div class="stat-label">Average Response</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">150+</div>
-                    <div class="stat-label">Publishers</div>
-                </div>
             </div>
         </section>
 
@@ -891,13 +664,13 @@ pub async fn index() -> impl Responder {
                 <a href="https://github.com" target="_blank">GitHub</a>
                 <a href="mailto:contact@example.com">Contact</a>
             </div>
-            <p id="copyright">© 2024 DOI Paper Downloader. Built with passion for open science.</p>
+            <p id="copyright">© 2024 {{SERVICE_NAME}}. Built with passion for open science.</p>
         </div>
     </footer>
 
     <script>
         // Update copyright year
-        document.getElementById('copyright').textContent = `© ${new Date().getFullYear()} DOI Paper Downloader. Built with passion for open science.`;
+        document.getElementById('copyright').textContent = `© ${new Date().getFullYear()} {{SERVICE_NAME}}. Built with passion for open science.`;
 
         // Particle Animation
         const particlesContainer = document.getElementById('particles');
@@ -1022,89 +795,13 @@ pub async fn index() -> impl Responder {
         `;
         document.head.appendChild(style);
 
-        // Intersection Observer for fade-in animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        // Observe feature cards
-        document.querySelectorAll('.feature-card').forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(30px)';
-            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(card);
-        });
-
-        // Observe stat cards
-        document.querySelectorAll('.stat-card').forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(card);
-        });
-
-        // Add counter animation for statistics
-        function animateValue(element, start, end, duration) {
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                element.textContent = element.dataset.prefix +
-                    Math.floor(progress * (end - start) + start) +
-                    element.dataset.suffix;
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
-        }
-
-        // Animate statistics when they come into view
-        const statsObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && !entry.target.dataset.animated) {
-                    entry.target.dataset.animated = 'true';
-                    const statNumbers = entry.target.querySelectorAll('.stat-number');
-                    statNumbers.forEach(stat => {
-                        const text = stat.textContent;
-                        if (text.includes('1M+')) {
-                            stat.dataset.prefix = '';
-                            stat.dataset.suffix = 'M+';
-                            animateValue(stat, 0, 1, 1500);
-                        } else if (text.includes('99.9%')) {
-                            stat.dataset.prefix = '';
-                            stat.dataset.suffix = '%';
-                            animateValue(stat, 0, 99.9, 1500);
-                        } else if (text.includes('150+')) {
-                            stat.dataset.prefix = '';
-                            stat.dataset.suffix = '+';
-                            animateValue(stat, 0, 150, 1500);
-                        }
-                    });
-                }
-            });
-        }, { threshold: 0.5 });
-
-        const statsSection = document.querySelector('.stats');
-        if (statsSection) {
-            statsObserver.observe(statsSection);
-        }
     </script>
 </body>
 </html>"##;
 
     let html = html
         .replace("{{SERVICE_NAME}}", SERVICE_NAME)
+        .replace("{{SERVICE_TITLE}}", SERVICE_TITLE)
         .replace("{{SERVICE_DESCRIPTION}}", SERVICE_DESCRIPTION)
         .replace("{{EXAMPLE_DOIS}}", &examples_html);
 

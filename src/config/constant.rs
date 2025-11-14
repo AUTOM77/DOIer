@@ -24,5 +24,6 @@ pub const EXAMPLE_DOIS: &[&str] = &[
     "10.48550/arXiv.2301.00001",           // ArXiv
 ];
 
-pub const SERVICE_NAME: &str = "DOI Researcher";
-pub const SERVICE_DESCRIPTION: &str = "Research instantly";
+pub const SERVICE_NAME: &str = "DOIer";
+pub const SERVICE_DESCRIPTION: &str = "Simple, fast, and reliable.";
+pub const SERVICE_TITLE: &str = "Access Paper Now";
