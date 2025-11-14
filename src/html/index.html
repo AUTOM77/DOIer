@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Services Hub</title>
+    <title>{{HUB_NAME}}</title>
     <style>
         * {
             margin: 0;
@@ -97,6 +97,10 @@
         .tags-container {
             text-align: center;
             margin-top: 1rem;
+            white-space: nowrap;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
         .status-badge {
@@ -152,8 +156,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>Services Hub</h1>
-        <p class="subtitle">Choose from our collection of research tools and services</p>
+        <h1>{{HUB_NAME}}</h1>
+        <p class="subtitle">{{HUB_SUBTITLE}}</p>
 
         <div class="products-grid">
             <!-- DOI Service -->

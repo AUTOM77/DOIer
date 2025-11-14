@@ -27,3 +27,6 @@ pub const EXAMPLE_DOIS: &[&str] = &[
 pub const SERVICE_NAME: &str = "DOIer";
 pub const SERVICE_DESCRIPTION: &str = "Simple, fast, and reliable.";
 pub const SERVICE_TITLE: &str = "Access Paper Now";
+
+pub const HUB_NAME: &str = "Campus Services";
+pub const HUB_SUBTITLE: &str = "Choose from our collection of research tools and services";
