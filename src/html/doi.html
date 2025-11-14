@@ -724,23 +724,19 @@
             particlesContainer.appendChild(particle);
         }
 
-        // Navbar scroll effect with direction detection
+        // Navbar scroll effect - keep last state when stopped
         let lastScrollY = window.scrollY;
-        let scrollTimer = null;
 
         window.addEventListener('scroll', () => {
             const navbar = document.getElementById('navbar');
             const currentScrollY = window.scrollY;
 
-            // Clear any existing timer
-            clearTimeout(scrollTimer);
-
             if (currentScrollY > lastScrollY && currentScrollY > 100) {
                 // Scrolling down
                 navbar.classList.add('transparent');
                 navbar.classList.remove('solid');
-            } else if (currentScrollY < lastScrollY || currentScrollY <= 50) {
-                // Scrolling up or at the top
+            } else if (currentScrollY < lastScrollY) {
+                // Scrolling up
                 navbar.classList.remove('transparent');
                 if (currentScrollY > 50) {
                     navbar.classList.add('solid');
@@ -748,16 +744,7 @@
                     navbar.classList.remove('solid');
                 }
             }
-
-            // Set timer to solidify navbar when scrolling stops
-            scrollTimer = setTimeout(() => {
-                navbar.classList.remove('transparent');
-                if (currentScrollY > 50) {
-                    navbar.classList.add('solid');
-                } else {
-                    navbar.classList.remove('solid');
-                }
-            }, 150);
+            // When stopped, keep the last state (no action needed)
 
             lastScrollY = currentScrollY;
         });

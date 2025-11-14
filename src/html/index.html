@@ -152,14 +152,87 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 1px 40px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            padding: 1rem 2rem;
+            transition: all 0.3s ease;
+        }
+
+        nav.transparent {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: none;
+        }
+
+        nav.solid {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow: 0 5px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .main-wrapper {
+            padding-top: 80px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>{{HUB_NAME}}</h1>
-        <p class="subtitle">{{HUB_SUBTITLE}}</p>
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="logo">{{HUB_NAME}}</div>
+        </div>
+    </nav>
 
-        <div class="products-grid">
+    <div class="main-wrapper">
+        <div class="container">
+            <h1>{{HUB_NAME}}</h1>
+            <p class="subtitle">{{HUB_SUBTITLE}}</p>
+
+            <div class="products-grid">
             <!-- DOI Service -->
             <a href="/doi" class="product-card">
                 <div class="status-badge status-active">Active</div>
@@ -206,5 +279,43 @@
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p id="copyright">© 2024 {{HUB_NAME}}. Built with passion for education.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Update copyright year
+        const hubName = '{{HUB_NAME}}';
+        document.getElementById('copyright').textContent = `© ${new Date().getFullYear()} ${hubName}. Built with passion for education.`;
+
+        // Navbar scroll effect - keep last state
+        let lastScrollY = window.scrollY;
+
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            const currentScrollY = window.scrollY;
+
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                // Scrolling down
+                navbar.classList.add('transparent');
+                navbar.classList.remove('solid');
+            } else if (currentScrollY < lastScrollY) {
+                // Scrolling up
+                navbar.classList.remove('transparent');
+                if (currentScrollY > 50) {
+                    navbar.classList.add('solid');
+                } else {
+                    navbar.classList.remove('solid');
+                }
+            }
+            // When stopped, keep the last state (no action needed)
+
+            lastScrollY = currentScrollY;
+        });
+    </script>
 </body>
 </html>
