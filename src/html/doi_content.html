@@ -1,0 +1,636 @@
+<!-- PAGE_META -->
+<meta name="description" content="{{SERVICE_DESCRIPTION}} Download research papers instantly using DOI.">
+
+<!-- PAGE_STYLES -->
+<style>
+    /* Progress Bar */
+    .progress-bar-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        z-index: 9999;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .progress-bar-container.active {
+        opacity: 1;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        width: 0;
+        transition: width 0.3s ease;
+        box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+    }
+
+    .message-container {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        z-index: 9998;
+        pointer-events: none;
+    }
+
+    .status-message {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 10px;
+        padding: 0.75rem 1.5rem;
+        min-width: 250px;
+        max-width: 350px;
+        display: block;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        transform: translateX(400px);
+        transition: all 0.4s ease;
+        margin-bottom: 1rem;
+        pointer-events: all;
+    }
+
+    .status-message.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .status-message.hiding {
+        opacity: 0;
+        transform: translateX(400px);
+        transition: all 0.4s ease;
+    }
+
+    .status-message.success {
+        border-color: rgba(0, 184, 148, 0.3);
+        background: rgba(0, 184, 148, 0.1);
+    }
+
+    .status-message.error {
+        border-color: rgba(255, 107, 107, 0.3);
+        background: rgba(255, 107, 107, 0.1);
+    }
+
+    .status-message.info {
+        border-color: rgba(116, 185, 255, 0.3);
+        background: rgba(116, 185, 255, 0.1);
+    }
+
+    body {
+        background: #0f0f1e;
+        color: #212529;
+        overflow-x: hidden;
+        line-height: 1.6;
+    }
+
+    /* Animated Background */
+    .background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: linear-gradient(125deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        animation: gradientShift 20s ease infinite;
+        background-size: 300% 300%;
+    }
+
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .background::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiPjxwYXRoIGQ9Ik0gMTAwIDAgTCAwIDAgMCAxMDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZmZmZjEwIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=');
+        opacity: 0.1;
+    }
+
+    /* Floating particles */
+    .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
+    }
+
+    .particle {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 20s infinite;
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0) translateX(0) scale(1);
+            opacity: 0;
+        }
+        10% {
+            opacity: 1;
+        }
+        90% {
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(-100vh) translateX(100px) scale(0.3);
+        }
+    }
+
+    /* Main Container */
+    .main-container {
+        min-height: 100vh;
+    }
+
+    /* Hero Section */
+    .hero {
+        padding: 100px 20px;
+        text-align: center;
+        position: relative;
+    }
+
+    .hero-content {
+        max-width: 900px;
+        margin: 0 auto;
+        animation: fadeInUp 1s ease;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    h1 {
+        font-size: clamp(2.5rem, 6vw, 4.5rem);
+        font-weight: 900;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
+        animation: textGlow 3s ease infinite alternate;
+    }
+
+    @keyframes textGlow {
+        from { filter: brightness(1); }
+        to { filter: brightness(1.2); }
+    }
+
+    .hero-subtitle {
+        font-size: clamp(1.1rem, 2vw, 1.4rem);
+        color: rgba(255, 255, 255, 0.95);
+        margin-bottom: 3rem;
+        font-weight: 400;
+        letter-spacing: 0.5px;
+    }
+
+    /* Search Card */
+    .search-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 3rem 2.5rem;
+        max-width: 1000px;
+        margin: 0 auto 4rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        animation: slideInUp 0.8s ease;
+    }
+
+    @keyframes slideInUp {
+        from {
+            transform: translateY(50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    /* Examples */
+    .examples-section {
+        margin-bottom: 2rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .examples-label {
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        display: block;
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .examples-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .example-item {
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 0.4rem 0.8rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Monaco', 'Menlo', monospace;
+        white-space: nowrap;
+    }
+
+    .example-item:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.25);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Search Form */
+    .search-form {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    input[type="text"] {
+        flex: 1;
+        padding: 1.2rem 1.5rem;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        font-size: 1.1rem;
+        color: white;
+        transition: all 0.3s;
+        font-family: 'Monaco', 'Menlo', monospace;
+    }
+
+    input[type="text"]::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    input[type="text"]:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    button {
+        padding: 1.2rem 2.5rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        letter-spacing: 0.5px;
+    }
+
+    button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+    }
+
+    button:active {
+        transform: translateY(0);
+    }
+
+    button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    /* API Documentation */
+    .api-section {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 3rem 2.5rem;
+        max-width: 1000px;
+        margin: 0 auto 3rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    .api-section h2 {
+        color: white;
+        font-size: 2rem;
+        margin-bottom: 2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .endpoint-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .endpoint-title {
+        color: #00ff7f;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-family: 'Monaco', 'Menlo', monospace;
+    }
+
+    .endpoint-description {
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+
+    pre {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 1rem;
+        overflow-x: auto;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-top: 1rem;
+    }
+
+    code {
+        font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .hero {
+            padding: 60px 20px;
+        }
+
+        .search-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .search-form {
+            flex-direction: column;
+        }
+
+        button {
+            width: 100%;
+        }
+    }
+</style>
+
+<!-- PAGE_CONTENT -->
+<div class="background"></div>
+<div class="particles" id="particles"></div>
+<div class="progress-bar-container" id="progressBar">
+    <div class="progress-bar" id="progressBarInner"></div>
+</div>
+<div class="message-container" id="messageContainer"></div>
+
+<div class="main-container">
+    <section class="hero">
+        <div class="hero-content">
+            <h1>{{SERVICE_NAME}}</h1>
+            <p class="hero-subtitle">{{SERVICE_DESCRIPTION}}</p>
+
+            <div class="search-card">
+                <div class="examples-section">
+                    <label class="examples-label">Try Examples:</label>
+                    <div class="examples-container">
+                        {{EXAMPLE_DOIS}}
+                    </div>
+                </div>
+
+                <div class="search-form">
+                    <input type="text" id="doiInput" placeholder="Enter DOI (e.g., 10.1038/nature12373)" />
+                    <button onclick="handleDownload()">Download</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="api-section" id="api">
+        <h2>API Documentation</h2>
+
+        <div class="endpoint-card">
+            <div class="endpoint-title">GET /api/download/{doi}</div>
+            <div class="endpoint-description">
+                Download a paper using its DOI identifier
+            </div>
+            <pre><code>curl "https://campus.monius.uk/api/download/10.1038/nature12373" \
+  -H "Accept: application/pdf" \
+  --output paper.pdf</code></pre>
+        </div>
+
+        <div class="endpoint-card">
+            <div class="endpoint-title">GET /api/metadata/{doi}</div>
+            <div class="endpoint-description">
+                Get metadata for a paper
+            </div>
+            <pre><code>curl "https://campus.monius.uk/api/metadata/10.1038/nature12373" \
+  -H "Accept: application/json"</code></pre>
+        </div>
+    </section>
+</div>
+
+<!-- PAGE_SCRIPTS -->
+<script>
+    // Create floating particles
+    function createParticles() {
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 30;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+
+            const size = Math.random() * 4 + 2;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = (Math.random() * 20 + 20) + 's';
+
+            particlesContainer.appendChild(particle);
+        }
+    }
+
+    createParticles();
+
+    // Fill DOI input with example
+    function fillDOI(doi) {
+        document.getElementById('doiInput').value = doi;
+        document.getElementById('doiInput').focus();
+    }
+
+    // Progress bar management
+    function showProgressBar() {
+        const progressBar = document.getElementById('progressBar');
+        const progressBarInner = document.getElementById('progressBarInner');
+        progressBar.classList.add('active');
+        progressBarInner.style.width = '0%';
+
+        setTimeout(() => progressBarInner.style.width = '20%', 100);
+        setTimeout(() => progressBarInner.style.width = '60%', 500);
+        setTimeout(() => progressBarInner.style.width = '80%', 1000);
+
+        return {
+            complete: () => {
+                progressBarInner.style.width = '100%';
+                setTimeout(() => {
+                    progressBar.classList.remove('active');
+                    progressBarInner.style.width = '0%';
+                }, 500);
+            },
+            error: () => {
+                progressBar.classList.remove('active');
+                progressBarInner.style.width = '0%';
+            }
+        };
+    }
+
+    // Message management
+    let currentMessage = null;
+    let messageTimeout = null;
+
+    function showMessage(message, type) {
+        if (currentMessage) {
+            currentMessage.classList.remove('show');
+            currentMessage.classList.add('hiding');
+            setTimeout(() => {
+                if (currentMessage && currentMessage.parentNode) {
+                    currentMessage.remove();
+                }
+            }, 400);
+        }
+
+        if (messageTimeout) {
+            clearTimeout(messageTimeout);
+        }
+
+        const messageContainer = document.getElementById('messageContainer');
+        const statusMessage = document.createElement('div');
+        statusMessage.className = `status-message ${type}`;
+        statusMessage.innerHTML = `
+            <span class="status-text">${message}</span>
+        `;
+
+        messageContainer.appendChild(statusMessage);
+        currentMessage = statusMessage;
+
+        setTimeout(() => {
+            statusMessage.classList.add('show');
+        }, 10);
+
+        messageTimeout = setTimeout(() => {
+            statusMessage.classList.remove('show');
+            statusMessage.classList.add('hiding');
+            setTimeout(() => {
+                if (statusMessage.parentNode) {
+                    statusMessage.remove();
+                }
+                if (currentMessage === statusMessage) {
+                    currentMessage = null;
+                }
+            }, 400);
+        }, 5000);
+    }
+
+    // Handle download
+    async function handleDownload() {
+        const doi = document.getElementById('doiInput').value.trim();
+
+        if (!doi) {
+            showMessage('Please enter a DOI', 'error');
+            return;
+        }
+
+        const progressBar = showProgressBar();
+        showMessage('Fetching paper...', 'info');
+
+        try {
+            const response = await fetch(`/api/download/${encodeURIComponent(doi)}`);
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status}`);
+            }
+
+            progressBar.complete();
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${doi.replace(/\//g, '_')}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            showMessage('Download complete!', 'success');
+        } catch (error) {
+            progressBar.error();
+            showMessage('Failed to download. Please check the DOI and try again.', 'error');
+            console.error('Download error:', error);
+        }
+    }
+
+    // Handle enter key
+    document.getElementById('doiInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            handleDownload();
+        }
+    });
+
+    // Smooth scroll for navigation
+    function handleNavClick(e, targetId) {
+        e.preventDefault();
+        const target = document.getElementById(targetId);
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        return false;
+    }
+</script>
