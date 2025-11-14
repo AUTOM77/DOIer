@@ -1,7 +1,14 @@
 use actix_web::{get, HttpResponse, Responder};
+use crate::config::constant::{EXAMPLE_DOIS, SERVICE_NAME, SERVICE_DESCRIPTION};
 
 #[get("/")]
 async fn index() -> impl Responder {
+    let examples_html = EXAMPLE_DOIS
+        .iter()
+        .map(|doi| format!(r#"<span class="example-item" onclick="fillDOI('{}')">{}</span>"#, doi, doi))
+        .collect::<Vec<_>>()
+        .join("\n            ");
+
     let html = r#"<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -226,8 +233,8 @@ async fn index() -> impl Responder {
 </head>
 <body>
     <div class="container">
-        <h1>📚 DOI Downloader</h1>
-        <p class="subtitle">Download research papers instantly using DOI</p>
+        <h1>📚 {{SERVICE_NAME}}</h1>
+        <p class="subtitle">{{SERVICE_DESCRIPTION}}</p>
 
         <div class="info-box">
             <p><strong>What is this?</strong></p>
@@ -255,9 +262,7 @@ async fn index() -> impl Responder {
 
         <div class="examples">
             <h3>Example DOIs (Click to try)</h3>
-            <span class="example-item" onclick="fillDOI('10.1038/nature12373')">10.1038/nature12373</span>
-            <span class="example-item" onclick="fillDOI('10.1126/science.1259855')">10.1126/science.1259855</span>
-            <span class="example-item" onclick="fillDOI('10.1016/j.cell.2020.02.052')">10.1016/j.cell.2020.02.052</span>
+            {{EXAMPLE_DOIS}}
         </div>
 
         <div class="api-endpoint">
@@ -340,6 +345,11 @@ async fn index() -> impl Responder {
     </script>
 </body>
 </html>"#;
+
+    let html = html
+        .replace("{{SERVICE_NAME}}", SERVICE_NAME)
+        .replace("{{SERVICE_DESCRIPTION}}", SERVICE_DESCRIPTION)
+        .replace("{{EXAMPLE_DOIS}}", &examples_html);
 
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")

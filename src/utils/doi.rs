@@ -139,12 +139,7 @@ impl Doi {
                 urls.push(format!("https://link.springer.com/content/pdf/{}.pdf", self.raw));
             }
             DoiPublisher::Elsevier => {
-                if let Some(pii) = self.raw.split('/').nth(1) {
-                    urls.push(format!(
-                        "https://www.sciencedirect.com/science/article/pii/{}/pdfft",
-                        pii
-                    ));
-                }
+                // ScienceDirect not supported - requires PII extraction from HTML
             }
             DoiPublisher::Wiley => {
                 urls.push(format!("https://onlinelibrary.wiley.com/doi/pdf/{}", self.raw));
