@@ -38,10 +38,12 @@ fn build_page(content: &str, title: &str, nav_items: &str) -> String {
 
 #[get("/")]
 pub async fn root_index() -> impl Responder {
+    let nav_items = r#"<li><a href="/doi">DOIer</a></li>"#;
+
     let html = build_page(
         INDEX_CONTENT,
-        &format!("{}", HUB_NAME),
-        r#"<li><a href="/doi">DOIer</a></li>"#
+        HUB_NAME,
+        nav_items
     )
     .replace("{{HUB_NAME}}", HUB_NAME)
     .replace("{{HUB_SUBTITLE}}", HUB_SUBTITLE);
@@ -54,11 +56,12 @@ pub async fn root_index() -> impl Responder {
 #[get("/doi")]
 pub async fn index() -> impl Responder {
     let examples_html = generate_examples_html();
+    let nav_items = r#"<li><a href="/doi">DOIer</a></li>"#;
 
     let html = build_page(
         DOI_CONTENT,
         &format!("{} - {}", SERVICE_NAME, SERVICE_TITLE),
-        r##"<li><a href="#api" onclick="return handleNavClick(event, 'api')">API</a></li>"##
+        nav_items
     )
     .replace("{{SERVICE_NAME}}", SERVICE_NAME)
     .replace("{{SERVICE_TITLE}}", SERVICE_TITLE)

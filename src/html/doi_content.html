@@ -83,81 +83,8 @@
         background: rgba(116, 185, 255, 0.1);
     }
 
-    body {
-        background: #0f0f1e;
-        color: #212529;
-        overflow-x: hidden;
-        line-height: 1.6;
-    }
 
-    /* Animated Background */
-    .background {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        background: linear-gradient(125deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-        animation: gradientShift 20s ease infinite;
-        background-size: 300% 300%;
-    }
 
-    @keyframes gradientShift {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-
-    .background::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiPjxwYXRoIGQ9Ik0gMTAwIDAgTCAwIDAgMCAxMDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZmZmZjEwIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=');
-        opacity: 0.1;
-    }
-
-    /* Floating particles */
-    .particles {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        z-index: -1;
-    }
-
-    .particle {
-        position: absolute;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-        animation: float 20s infinite;
-    }
-
-    @keyframes float {
-        0%, 100% {
-            transform: translateY(0) translateX(0) scale(1);
-            opacity: 0;
-        }
-        10% {
-            opacity: 1;
-        }
-        90% {
-            opacity: 1;
-        }
-        100% {
-            transform: translateY(-100vh) translateX(100px) scale(0.3);
-        }
-    }
-
-    /* Main Container */
-    .main-container {
-        min-height: 100vh;
-    }
 
     /* Hero Section */
     .hero {
@@ -419,8 +346,6 @@
 </style>
 
 <!-- PAGE_CONTENT -->
-<div class="background"></div>
-<div class="particles" id="particles"></div>
 <div class="progress-bar-container" id="progressBar">
     <div class="progress-bar" id="progressBarInner"></div>
 </div>
@@ -474,31 +399,6 @@
 
 <!-- PAGE_SCRIPTS -->
 <script>
-    // Create floating particles
-    function createParticles() {
-        const particlesContainer = document.getElementById('particles');
-        const particleCount = 30;
-
-        for (let i = 0; i < particleCount; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-
-            const size = Math.random() * 4 + 2;
-            particle.style.width = size + 'px';
-            particle.style.height = size + 'px';
-
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.top = Math.random() * 100 + '%';
-
-            particle.style.animationDelay = Math.random() * 20 + 's';
-            particle.style.animationDuration = (Math.random() * 20 + 20) + 's';
-
-            particlesContainer.appendChild(particle);
-        }
-    }
-
-    createParticles();
-
     // Fill DOI input with example
     function fillDOI(doi) {
         document.getElementById('doiInput').value = doi;
