@@ -142,7 +142,7 @@ impl Doi {
                 // ScienceDirect not supported - requires PII extraction from HTML
             }
             DoiPublisher::Wiley => {
-                urls.push(format!("https://onlinelibrary.wiley.com/doi/pdf/{}", self.raw));
+                urls.push(format!("https://onlinelibrary.wiley.com/doi/pdfdirect/{}?download=true", self.raw));
             }
             DoiPublisher::Nature => {
                 if let Some(article_id) = self.raw.split('/').nth(1) {
@@ -206,7 +206,7 @@ impl Doi {
             }
             DoiPublisher::Hindawi => {
                 // Hindawi now hosted on Wiley Online Library
-                urls.push(format!("https://onlinelibrary.wiley.com/doi/epdf/{}", self.raw));
+                urls.push(format!("https://onlinelibrary.wiley.com/doi/pdfdirect/{}?download=true", self.raw));
             }
             DoiPublisher::Frontiers => {
                 urls.push(format!("https://www.frontiersin.org/articles/{}/pdf", self.raw));
