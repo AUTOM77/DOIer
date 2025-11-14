@@ -1,6 +1,7 @@
 mod config;
 mod endpoints;
 mod utils;
+mod templates;
 
 use actix_web::{App, HttpServer};
 
