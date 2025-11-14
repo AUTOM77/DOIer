@@ -624,8 +624,6 @@
         <div class="nav-container">
             <a href="/" class="logo" style="text-decoration: none;">{{HUB_NAME}}</a>
             <ul class="nav-links">
-                <li><a href="/">Hub</a></li>
-                <li><a href="#home" onclick="return handleNavClick(event, 'home')">Home</a></li>
                 <li><a href="#api" onclick="return handleNavClick(event, 'api')">API</a></li>
             </ul>
         </div>
@@ -702,14 +700,14 @@
     <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <p id="copyright">© 2024 {{SERVICE_NAME}}. Built with passion for open science.</p>
+            <p id="copyright">© 2024 {{HUB_NAME}}. Built with passion for education.</p>
         </div>
     </footer>
 
     <script>
         // Update copyright year
-        const serviceName = '{{SERVICE_NAME}}';
-        document.getElementById('copyright').textContent = `© ${new Date().getFullYear()} ${serviceName}. Built with passion for open science.`;
+        const hubName = '{{HUB_NAME}}';
+        document.getElementById('copyright').textContent = `© ${new Date().getFullYear()} ${hubName}. Built with passion for education.`;
 
         // Particle Animation
         const particlesContainer = document.getElementById('particles');
