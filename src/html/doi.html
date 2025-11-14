@@ -38,12 +38,11 @@
         }
 
         .message-container {
-            margin-top: 1.5rem;
-            min-height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9998;
+            pointer-events: none;
         }
 
         .status-message {
@@ -52,20 +51,30 @@
             -webkit-backdrop-filter: blur(12px);
             border-radius: 10px;
             padding: 0.75rem 1.5rem;
-            display: inline-block;
+            min-width: 250px;
+            max-width: 350px;
+            display: block;
             font-size: 0.95rem;
             font-weight: 500;
             color: rgba(255, 255, 255, 0.9);
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             opacity: 0;
-            transform: scale(0.95);
-            transition: all 0.3s ease;
+            transform: translateX(400px);
+            transition: all 0.4s ease;
+            margin-bottom: 1rem;
+            pointer-events: all;
         }
 
         .status-message.show {
             opacity: 1;
-            transform: scale(1);
+            transform: translateX(0);
+        }
+
+        .status-message.hiding {
+            opacity: 0;
+            transform: translateX(400px);
+            transition: all 0.4s ease;
         }
 
         .status-message.success {
@@ -603,6 +612,9 @@
         <div class="progress-bar" id="progressBar"></div>
     </div>
 
+    <!-- Message Container -->
+    <div class="message-container" id="messageContainer"></div>
+
     <!-- Background Elements -->
     <div class="background"></div>
     <div class="particles" id="particles"></div>
@@ -653,13 +665,6 @@
                             <button type="button" class="btn-secondary" onclick="clearForm()">
                                 Clear
                             </button>
-                        </div>
-
-                        <!-- Status Message Container -->
-                        <div class="message-container">
-                            <div id="statusMessage" class="status-message">
-                                <span class="status-text"></span>
-                            </div>
                         </div>
                     </form>
                 </div>
@@ -770,16 +775,29 @@
             return false;
         }
 
-        // In-place Message System
+        // Message System (sliding from right)
+        let currentMessage = null;
+
         function showMessage(message, type) {
-            const statusMessage = document.getElementById('statusMessage');
-            const statusText = statusMessage.querySelector('.status-text');
+            // Hide current message if exists
+            if (currentMessage) {
+                currentMessage.classList.remove('show');
+                currentMessage.classList.add('hiding');
+                setTimeout(() => {
+                    if (currentMessage && currentMessage.parentNode) {
+                        currentMessage.parentNode.removeChild(currentMessage);
+                    }
+                }, 400);
+            }
 
-            // Update content
-            statusText.textContent = message;
-
-            // Update classes
+            // Create new message element
+            const messageContainer = document.getElementById('messageContainer');
+            const statusMessage = document.createElement('div');
             statusMessage.className = `status-message ${type}`;
+            statusMessage.innerHTML = `<span class="status-text">${message}</span>`;
+
+            messageContainer.appendChild(statusMessage);
+            currentMessage = statusMessage;
 
             // Show message with animation
             setTimeout(() => {
@@ -789,14 +807,33 @@
             // Auto-hide success and error messages after delay
             if (type !== 'info') {
                 setTimeout(() => {
-                    statusMessage.classList.remove('show');
+                    if (statusMessage.classList.contains('show')) {
+                        statusMessage.classList.remove('show');
+                        statusMessage.classList.add('hiding');
+                        setTimeout(() => {
+                            if (statusMessage.parentNode) {
+                                statusMessage.parentNode.removeChild(statusMessage);
+                            }
+                            if (currentMessage === statusMessage) {
+                                currentMessage = null;
+                            }
+                        }, 400);
+                    }
                 }, 5000);
             }
         }
 
         function hideMessage() {
-            const statusMessage = document.getElementById('statusMessage');
-            statusMessage.classList.remove('show');
+            if (currentMessage) {
+                currentMessage.classList.remove('show');
+                currentMessage.classList.add('hiding');
+                setTimeout(() => {
+                    if (currentMessage && currentMessage.parentNode) {
+                        currentMessage.parentNode.removeChild(currentMessage);
+                    }
+                    currentMessage = null;
+                }, 400);
+            }
         }
 
         // Progress Bar
