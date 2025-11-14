@@ -3,6 +3,8 @@
     .container {
         max-width: 1400px;
         width: 100%;
+        margin: 0 auto;
+        overflow: visible;
     }
 
     h1 {
@@ -28,7 +30,8 @@
         justify-content: center;
         flex-wrap: nowrap;
         overflow-x: auto;
-        padding: 0 1rem;
+        overflow-y: visible;
+        padding: 1rem 1rem 2rem 1rem;
     }
 
     .product-card {
@@ -88,16 +91,16 @@
         padding: 0.25rem 0.75rem;
         border-radius: 20px;
         font-size: 0.85rem;
-        margin: 0.25rem;
     }
 
     .tags-container {
         text-align: center;
         margin-top: 1rem;
-        white-space: nowrap;
         display: flex;
+        flex-wrap: wrap;
         justify-content: center;
-        gap: 0.5rem;
+        gap: 0.4rem;
+        max-width: 100%;
     }
 
     .status-badge {

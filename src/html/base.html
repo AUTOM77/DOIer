@@ -92,10 +92,10 @@
             position: fixed;
             top: 0;
             width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 1px 40px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: none;
             z-index: 1000;
             padding: 0 2rem;
             height: 60px;
@@ -224,7 +224,7 @@
     <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <p id="copyright">© 2024 {{HUB_NAME}}. Built with passion for education.</p>
+            <p id="copyright">© <span id="year">2024</span> {{HUB_NAME}}. Built with passion for education.</p>
         </div>
     </footer>
 
@@ -254,31 +254,40 @@
 
         createParticles();
 
-        // Update copyright year
-        const hubName = '{{HUB_NAME}}';
-        document.getElementById('copyright').textContent = `© ${new Date().getFullYear()} ${hubName}. Built with passion for education.`;
+        // Update copyright year dynamically
+        document.getElementById('year').textContent = new Date().getFullYear();
 
-        // Navbar scroll effect - keep last state
+        // Navbar scroll effect
         let lastScrollY = window.scrollY;
+        const navbar = document.getElementById('navbar');
+
+        // Set initial state based on current scroll position
+        if (window.scrollY === 0) {
+            navbar.classList.remove('solid');
+            navbar.classList.add('transparent');
+        } else {
+            navbar.classList.add('solid');
+            navbar.classList.remove('transparent');
+        }
 
         window.addEventListener('scroll', () => {
-            const navbar = document.getElementById('navbar');
             const currentScrollY = window.scrollY;
 
             if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                // Scrolling down
+                // Scrolling down - make transparent
                 navbar.classList.add('transparent');
                 navbar.classList.remove('solid');
             } else if (currentScrollY < lastScrollY) {
-                // Scrolling up
+                // Scrolling up - make solid
                 navbar.classList.remove('transparent');
-                if (currentScrollY > 50) {
-                    navbar.classList.add('solid');
-                } else {
+                navbar.classList.add('solid');
+
+                // If scrolled to top, make transparent
+                if (currentScrollY === 0) {
                     navbar.classList.remove('solid');
+                    navbar.classList.add('transparent');
                 }
             }
-            // When stopped, keep the last state (no action needed)
 
             lastScrollY = currentScrollY;
         });

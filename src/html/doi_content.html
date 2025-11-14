@@ -176,6 +176,15 @@
         letter-spacing: 1px;
     }
 
+    .examples-label::after {
+        content: " (click to download)";
+        font-size: 0.8rem;
+        text-transform: none;
+        opacity: 0.7;
+        font-weight: normal;
+        letter-spacing: normal;
+    }
+
     .examples-container {
         display: flex;
         flex-wrap: wrap;
@@ -194,14 +203,20 @@
         transition: all 0.3s ease;
         font-family: 'Monaco', 'Menlo', monospace;
         white-space: nowrap;
+        position: relative;
     }
 
     .example-item:hover {
-        background: rgba(255, 255, 255, 0.15);
-        border-color: rgba(255, 255, 255, 0.25);
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+        border-color: rgba(102, 126, 234, 0.4);
         color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .example-item:active {
+        transform: translateY(0) scale(1);
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
     }
 
     /* Search Form */
@@ -377,32 +392,55 @@
         <h2>API Documentation</h2>
 
         <div class="endpoint-card">
-            <div class="endpoint-title">GET /api/download/{doi}</div>
+            <div class="endpoint-title">GET /v1/doi/{doi}</div>
             <div class="endpoint-description">
-                Download a paper using its DOI identifier
+                Download a paper PDF using its DOI identifier. The DOI should be provided without any URL encoding.
             </div>
-            <pre><code>curl "https://campus.monius.uk/api/download/10.1038/nature12373" \
+            <pre><code># Example: Download a Nature paper
+curl "https://$domain/v1/doi/10.1038/nature12373" \
   -H "Accept: application/pdf" \
+  --output paper.pdf
+
+# Example: Download a Science paper
+curl "https://$domain/v1/doi/10.1126/science.1259855" \
+  --output science-paper.pdf
+
+# Using with localhost
+curl "http://localhost:8080/v1/doi/10.1038/nature12373" \
   --output paper.pdf</code></pre>
         </div>
 
         <div class="endpoint-card">
-            <div class="endpoint-title">GET /api/metadata/{doi}</div>
+            <div class="endpoint-title">Response Codes</div>
             <div class="endpoint-description">
-                Get metadata for a paper
+                The API returns standard HTTP status codes to indicate success or failure.
             </div>
-            <pre><code>curl "https://campus.monius.uk/api/metadata/10.1038/nature12373" \
-  -H "Accept: application/json"</code></pre>
+            <pre><code>200 OK - Paper successfully retrieved
+400 Bad Request - Invalid DOI format (must start with "10." and contain "/")
+404 Not Found - Paper not found or unavailable
+500 Internal Server Error - Server error while fetching paper</code></pre>
+        </div>
+
+        <div class="endpoint-card">
+            <div class="endpoint-title">DOI Format</div>
+            <div class="endpoint-description">
+                The DOI must be provided as a bare identifier without any prefix URLs.
+            </div>
+            <pre><code>✓ Correct: /v1/doi/10.1038/nature12373
+✗ Wrong: /v1/doi/https://doi.org/10.1038/nature12373
+✗ Wrong: /v1/doi/doi:10.1038/nature12373</code></pre>
         </div>
     </section>
 </div>
 
 <!-- PAGE_SCRIPTS -->
 <script>
-    // Fill DOI input with example
+    // Fill DOI input with example and download
     function fillDOI(doi) {
         document.getElementById('doiInput').value = doi;
         document.getElementById('doiInput').focus();
+        // Automatically trigger download after filling
+        handleDownload();
     }
 
     // Progress bar management
@@ -491,7 +529,7 @@
         showMessage('Fetching paper...', 'info');
 
         try {
-            const response = await fetch(`/api/download/${encodeURIComponent(doi)}`);
+            const response = await fetch(`/v1/doi/${encodeURIComponent(doi)}`);
 
             if (!response.ok) {
                 throw new Error(`Error: ${response.status}`);
