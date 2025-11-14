@@ -68,6 +68,19 @@ impl Paper {
             return Self::stream_as_pdf(resp, doi);
         }
 
+        // Check if redirected to MDPI landing page
+        let final_url = resp.url().as_str();
+        eprintln!("Final URL after redirect: {}", final_url);
+        if final_url.contains("www.mdpi.com") && !final_url.ends_with("/pdf") {
+            let pdf_url = format!("{}/pdf", final_url.trim_end_matches('/'));
+            eprintln!("MDPI detected, trying PDF URL: {}", pdf_url);
+            let pdf_resp = self.request_pdf(&pdf_url).await?;
+            if Self::is_pdf(&pdf_resp) {
+                eprintln!("PDF found at MDPI PDF URL");
+                return Self::stream_as_pdf(pdf_resp, doi);
+            }
+        }
+
         eprintln!("Could not locate PDF for DOI: {}", doi);
         Err(actix_web::error::ErrorBadGateway(
             "Could not locate PDF",

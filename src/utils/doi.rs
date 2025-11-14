@@ -202,8 +202,8 @@ impl Doi {
 
             // Large open-access publishers
             DoiPublisher::Mdpi => {
-                // MDPI not supported - requires journal ISSN mapping and complex DOI parsing
-                // Example: 10.3390/molecules26010001 -> https://www.mdpi.com/1420-3049/26/1/1/pdf
+                // MDPI handled via DOI redirect + /pdf appending in paper.rs
+                // No direct URL generation needed
             }
             DoiPublisher::Hindawi => {
                 // Hindawi now hosted on Wiley Online Library

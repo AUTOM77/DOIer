@@ -5,6 +5,7 @@ pub const EXAMPLE_DOIS: &[&str] = &[
 
     // Open access publishers
     "10.1371/journal.pone.0123456",        // PLOS
+    "10.3390/molecules26010001",           // MDPI
     "10.3389/fpsyg.2020.00001",            // Frontiers
     "10.1155/2021/5553425",                // Hindawi
 
