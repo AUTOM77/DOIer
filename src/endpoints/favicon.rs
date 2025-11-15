@@ -13,15 +13,6 @@ const FAVICON_SVG: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 
 
 #[get("/favicon.ico")]
 pub async fn favicon_ico() -> impl Responder {
-    // Return SVG favicon as browsers now support SVG favicons
-    HttpResponse::Ok()
-        .content_type("image/svg+xml")
-        .append_header(("Cache-Control", "public, max-age=86400"))
-        .body(FAVICON_SVG)
-}
-
-#[get("/favicon.svg")]
-pub async fn favicon_svg() -> impl Responder {
     HttpResponse::Ok()
         .content_type("image/svg+xml")
         .append_header(("Cache-Control", "public, max-age=86400"))
