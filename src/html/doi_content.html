@@ -361,6 +361,65 @@
 </style>
 
 <!-- PAGE_CONTENT -->
+<script>
+    // Define handleDownload immediately so it's available for onclick handlers
+    window.handleDownload = async function() {
+        const doi = document.getElementById('doiInput').value.trim();
+
+        if (!doi) {
+            if (typeof showMessage !== 'undefined') {
+                showMessage('Please enter a DOI', 'error');
+            }
+            return;
+        }
+
+        if (typeof showProgressBar !== 'undefined') {
+            const progressBar = showProgressBar();
+            if (typeof showMessage !== 'undefined') {
+                showMessage('Fetching paper...', 'info');
+            }
+
+            try {
+                const response = await fetch(`/v1/doi/${doi}`);
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status}`);
+                }
+
+                progressBar.complete();
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${doi.replace(/\//g, '_')}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                if (typeof showMessage !== 'undefined') {
+                    showMessage('Download complete!', 'success');
+                }
+            } catch (error) {
+                progressBar.error();
+                if (typeof showMessage !== 'undefined') {
+                    showMessage('Failed to download. Please check the DOI and try again.', 'error');
+                }
+                console.error('Download error:', error);
+            }
+        }
+    }
+
+    // Define fillDOI immediately so it's available for onclick handlers
+    window.fillDOI = function(doi) {
+        document.getElementById('doiInput').value = doi;
+        document.getElementById('doiInput').focus();
+        // Automatically trigger download after filling
+        handleDownload();
+    }
+</script>
+
 <div class="progress-bar-container" id="progressBar">
     <div class="progress-bar" id="progressBarInner"></div>
 </div>
@@ -434,15 +493,6 @@ curl "http://localhost:8080/v1/doi/10.1038/nature12373" \
 </div>
 
 <!-- PAGE_SCRIPTS -->
-<script>
-    // Fill DOI input with example and download
-    window.fillDOI = function(doi) {
-        document.getElementById('doiInput').value = doi;
-        document.getElementById('doiInput').focus();
-        // Automatically trigger download after filling
-        handleDownload();
-    }
-
     // Progress bar management
     function showProgressBar() {
         const progressBar = document.getElementById('progressBar');
@@ -516,7 +566,7 @@ curl "http://localhost:8080/v1/doi/10.1038/nature12373" \
         }, 5000);
     }
 
-    // Handle download
+    // Update handleDownload with proper helper functions now that they're defined
     window.handleDownload = async function() {
         const doi = document.getElementById('doiInput').value.trim();
 
@@ -571,4 +621,3 @@ curl "http://localhost:8080/v1/doi/10.1038/nature12373" \
         }
         return false;
     }
-</script>
